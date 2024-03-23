@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
+    "baseUrl": "./src",
+    "paths": {
+      "@Applications/*": ["./Applications/*"],
+      "@Domains/*": ["./Domains/*"],
+      "@Infrastructures/*": ["./Infrastructures/*"],
+      "@Interfaces/*": ["./Interfaces/*"]
+    },
+    "sourceMap": true,
+    "outDir": "./dist",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*"]
+}
