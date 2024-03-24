@@ -1,4 +1,4 @@
-import type { Container } from 'types'
+import type { Container } from '@Applications/common/types'
 import { createServer } from '../create_server'
 import * as httpStatus from 'http-status'
 

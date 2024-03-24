@@ -3,7 +3,7 @@ import * as Jwt from '@hapi/jwt'
 import { config } from '@Applications/common/config'
 import { ClientError } from '@Applications/common/exceptions/ClientError'
 import * as httpStatus from 'http-status'
-import type { Container, PluginOptions } from 'types'
+import type { Container, PluginOptions } from '@Applications/common/types'
 
 import { auth } from '@Interfaces/http/api/auth'
 

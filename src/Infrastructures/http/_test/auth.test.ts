@@ -12,6 +12,10 @@ describe('POST /auth/login', () => {
     await usersTableTestHelper.truncateTable()
   })
 
+  afterAll(async () => {
+    await pool.end()
+  })
+
   it('should response 400 if the payload is incomplete', async () => {
     const requestPayload = {
       email: 'johndoe@mail.com',

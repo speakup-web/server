@@ -10,6 +10,10 @@ describe('UserRepositoryPostgres', () => {
     await usersTableTestHelper.truncateTable()
   })
 
+  afterAll(async () => {
+    await pool.end()
+  })
+
   describe('getPasswordByEmail function', () => {
     it('should throw InvariantError when user not found', async () => {
       const nonExistentEmail = 'johndoe@mail.co'

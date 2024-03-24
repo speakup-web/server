@@ -1,5 +1,5 @@
 import type { Plugin } from '@hapi/hapi'
-import type { PluginOptions } from '../../../../types'
+import type { PluginOptions } from '../../../../Applications/common/types'
 import { AuthHandler } from './handler'
 import { routes } from './routes'
 

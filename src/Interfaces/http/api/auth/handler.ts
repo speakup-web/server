@@ -1,5 +1,5 @@
 import type { Request, ResponseObject, ResponseToolkit } from '@hapi/hapi'
-import type { Container } from '../../../../types'
+import type { Container } from '../../../../Applications/common/types'
 import type { LoginUseCase } from '@Applications/use_cases/login.use_case'
 
 export class AuthHandler {
