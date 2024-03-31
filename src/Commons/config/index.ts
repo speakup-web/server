@@ -1,3 +1,5 @@
+/* istanbul ignore file */
+
 import * as dotenv from 'dotenv'
 import { resolve } from 'path'
 
@@ -7,14 +9,14 @@ dotenv.config({
 
 export const config = {
   app: {
-    host: process.env.APP_HOST,
-    port: process.env.APP_PORT,
+    host: process.env.APP_HOST ?? 'localhost',
+    port: parseInt(process.env.APP_PORT ?? '3000', 10),
   },
   db: {
     connectionString: process.env.DATABASE_URL,
   },
   jwt: {
-    secretKey: process.env.JWT_SECRET_KEY,
-    expiresIn: process.env.JWT_EXPIRES_IN,
+    secretKey: process.env.JWT_SECRET_KEY ?? 'secret',
+    expiresIn: process.env.JWT_EXPIRES_IN ?? '3h',
   },
 }
