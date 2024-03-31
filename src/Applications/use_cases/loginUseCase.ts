@@ -33,9 +33,8 @@ export class LoginUseCase {
     }
 
     const accessToken = await this.tokenManager.generate({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
+      sub: user.id,
+      role: user.role,
     })
 
     return accessToken

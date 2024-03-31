@@ -103,9 +103,8 @@ describe('LoginUseCase', () => {
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(useCasePayload.email)
     expect(mockHasher.compare).toHaveBeenCalledWith(useCasePayload.password, user.password)
     expect(mockTokenManager.generate).toHaveBeenCalledWith({
-      userId: user.id,
-      email: user.email,
-      name: user.name,
+      sub: user.id,
+      role: user.role,
     })
   })
 })
