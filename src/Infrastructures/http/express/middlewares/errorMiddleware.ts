@@ -12,12 +12,12 @@ export function errorMiddleware(err: unknown, req: Request, res: Response, next:
         status: 'fail',
         message: err.message,
       })
+    } else {
+      res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
+        status: 'error',
+        message: 'Internal Server Error.',
+      })
     }
-
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-      status: 'error',
-      message: 'Internal Server Error.',
-    })
   }
 
   next()
