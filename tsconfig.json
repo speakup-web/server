@@ -20,5 +20,5 @@
     "skipLibCheck": true,
     "typeRoots": ["./src/Commons/types", "./node_modules/@types"]
   },
-  "include": ["src/**/*", "migrations/*", "test/**/*"]
+  "include": ["src/**/*", "migrations/*", "seeder/*", "test/**/*"]
 }
