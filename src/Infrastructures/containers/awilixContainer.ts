@@ -11,7 +11,7 @@ import { ZodValidator } from '@Infrastructures/validation/zod/zodValidator'
 import { UserRepositoryPostgres } from '@Infrastructures/repositories/userRepositoryPostgres'
 import { JwtTokenManager } from '@Infrastructures/security/jwtTokenManager'
 // Importing the use cases
-import { LoginUseCase } from '@Applications/use_cases/loginUseCase'
+import { LoginUserUseCase } from '@Applications/use_cases/loginUserUseCase'
 import { BcryptHasher } from '@Infrastructures/security/bcryptHasher'
 
 export const awilixContainer = awilix.createContainer({
@@ -24,13 +24,10 @@ awilixContainer.register({
   jwt: awilix.asValue(jose),
   bcrypt: awilix.asValue(bcrypt),
 
-  // Registering the validation schemas
-  loginSchema: awilix.asValue(LoginSchema),
-
   // Registering the validators
   loginValidator: awilix.asClass(ZodValidator, {
-    injector: (instance) => ({
-      schema: instance.resolve('loginSchema'),
+    injector: () => ({
+      schema: LoginSchema,
     }),
   }),
 
@@ -52,7 +49,7 @@ awilixContainer.register({
   }),
 
   // Registering the use cases
-  loginUseCase: awilix.asClass(LoginUseCase, {
+  loginUserUseCase: awilix.asClass(LoginUserUseCase, {
     injector: (instance) => ({
       validator: instance.resolve('loginValidator'),
       userRepository: instance.resolve('userRepository'),

@@ -19,12 +19,12 @@ describe('UserRepositoryPostgres', () => {
   })
 
   describe('findByEmail', () => {
-    it('should return undefined when user not found', async () => {
+    it('should return null when user not found', async () => {
       const userRepositoryPostgres = new UserRepositoryPostgres(pool)
 
       const result = await userRepositoryPostgres.findByEmail('example@mail.com')
 
-      expect(result).toBeUndefined()
+      expect(result).toBeNull()
     })
 
     it('should return user correctly', async () => {

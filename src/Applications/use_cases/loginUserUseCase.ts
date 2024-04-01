@@ -9,7 +9,7 @@ interface UseCasePayload {
   password: string
 }
 
-export class LoginUseCase {
+export class LoginUserUseCase {
   constructor(
     private readonly validator: IValidator<UseCasePayload>,
     private readonly userRepository: IUserRepository,
@@ -17,7 +17,7 @@ export class LoginUseCase {
     private readonly hasher: IHasher,
   ) {}
 
-  async execute(useCasePayload: UseCasePayload) {
+  async execute(useCasePayload: unknown) {
     const payload = this.validator.validate(useCasePayload)
 
     const user = await this.userRepository.findByEmail(payload.email)
@@ -37,6 +37,8 @@ export class LoginUseCase {
       role: user.role,
     })
 
-    return accessToken
+    return {
+      accessToken,
+    }
   }
 }

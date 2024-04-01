@@ -13,6 +13,6 @@ export class ZodValidator<T extends z.ZodTypeAny> implements IValidator<z.infer<
       throw new InvariantError(`${message} at ${path.join('.')} path.`)
     }
 
-    return result.data as z.infer<typeof this.schema>
+    return result.data
   }
 }

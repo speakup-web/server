@@ -5,7 +5,7 @@ import { type Pool } from 'pg'
 export class UserRepositoryPostgres implements IUserRepository {
   constructor(private readonly pool: Pool) {}
 
-  async findByEmail(email: string): Promise<User | undefined> {
+  async findByEmail(email: string): Promise<User | null> {
     const query = {
       text: `SELECT *
              FROM users
@@ -16,7 +16,7 @@ export class UserRepositoryPostgres implements IUserRepository {
     const { rows, rowCount } = await this.pool.query(query)
 
     if (!rowCount) {
-      return undefined
+      return null
     }
 
     return new User(rows[0])

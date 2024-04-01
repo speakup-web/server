@@ -1,9 +1,9 @@
 interface Payload {
-  id: string
-  name: string
-  email: string
-  password: string
-  role: string
+  id: User['id']
+  name: User['name']
+  email: User['email']
+  password: User['password']
+  role: User['role']
 }
 
 export class User {

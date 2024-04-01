@@ -3,10 +3,10 @@ import { type ITokenManager } from '@Applications/security/tokenManager'
 import { type IValidator } from '@Applications/validation/validator'
 import { User } from '@Domains/entitites/user'
 import { type IUserRepository } from '@Domains/repositories/userRepository'
-import { LoginUseCase } from '../loginUseCase'
+import { LoginUserUseCase } from '../loginUserUseCase'
 import { AuthenticationError } from '@Commons/exceptions/authenticationError'
 
-describe('LoginUseCase', () => {
+describe('LoginUserUseCase', () => {
   it('should throw AuthenticationError when user is not found', async () => {
     const useCasePayload = {
       email: 'johndoe@mail.com',
@@ -17,17 +17,17 @@ describe('LoginUseCase', () => {
       validate: jest.fn().mockReturnValueOnce(useCasePayload),
     }
     const mockUserRepository: Partial<IUserRepository> = {
-      findByEmail: jest.fn().mockResolvedValueOnce(undefined),
+      findByEmail: jest.fn().mockResolvedValueOnce(null),
     }
 
-    const loginUseCase = new LoginUseCase(
+    const loginUserUseCase = new LoginUserUseCase(
       mockValidator as IValidator<typeof useCasePayload>,
       mockUserRepository as IUserRepository,
       {} as ITokenManager,
       {} as IHasher,
     )
 
-    await expect(loginUseCase.execute(useCasePayload)).rejects.toThrow(AuthenticationError)
+    await expect(loginUserUseCase.execute(useCasePayload)).rejects.toThrow(AuthenticationError)
   })
 
   it('should throw AuthenticationError when password is incorrect', async () => {
@@ -53,14 +53,14 @@ describe('LoginUseCase', () => {
       compare: jest.fn().mockResolvedValueOnce(false),
     }
 
-    const loginUseCase = new LoginUseCase(
+    const loginUserUseCase = new LoginUserUseCase(
       mockValidator as IValidator<typeof useCasePayload>,
       mockUserRepository as IUserRepository,
       {} as ITokenManager,
       mockHasher as IHasher,
     )
 
-    await expect(loginUseCase.execute(useCasePayload)).rejects.toThrow(AuthenticationError)
+    await expect(loginUserUseCase.execute(useCasePayload)).rejects.toThrow(AuthenticationError)
   })
 
   it('should orchestrates the login use case', async () => {
@@ -89,16 +89,16 @@ describe('LoginUseCase', () => {
       compare: jest.fn().mockResolvedValueOnce(true),
     }
 
-    const loginUseCase = new LoginUseCase(
+    const loginUserUseCase = new LoginUserUseCase(
       mockValidator as IValidator<typeof useCasePayload>,
       mockUserRepository as IUserRepository,
       mockTokenManager as ITokenManager,
       mockHasher as IHasher,
     )
 
-    const accessToken = await loginUseCase.execute(useCasePayload)
+    const data = await loginUserUseCase.execute(useCasePayload)
 
-    expect(accessToken).toEqual('access_token')
+    expect(data.accessToken).toEqual('access_token')
     expect(mockValidator.validate).toHaveBeenCalledWith(useCasePayload)
     expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(useCasePayload.email)
     expect(mockHasher.compare).toHaveBeenCalledWith(useCasePayload.password, user.password)
