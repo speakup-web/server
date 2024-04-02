@@ -4,7 +4,7 @@ import { pool } from '@Infrastructures/database/postgres/pool'
 import * as jose from 'jose'
 import * as bcrypt from 'bcrypt'
 // Importing the validation schemas
-import { LoginSchema } from '@Infrastructures/validation/zod/schemas/authSchemas'
+import { LoginUserSchema } from '@Infrastructures/validation/zod/schemas/authSchemas'
 // Importing the validator
 import { ZodValidator } from '@Infrastructures/validation/zod/zodValidator'
 // Importing the repository
@@ -27,7 +27,7 @@ awilixContainer.register({
   // Registering the validators
   loginValidator: awilix.asClass(ZodValidator, {
     injector: () => ({
-      schema: LoginSchema,
+      schema: LoginUserSchema,
     }),
   }),
 

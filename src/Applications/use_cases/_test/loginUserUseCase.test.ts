@@ -1,7 +1,7 @@
 import { type IHasher } from '@Applications/security/hasher'
 import { type ITokenManager } from '@Applications/security/tokenManager'
 import { type IValidator } from '@Applications/validation/validator'
-import { User } from '@Domains/entitites/user'
+import { User, UserRoles } from '@Domains/entitites/user'
 import { type IUserRepository } from '@Domains/repositories/userRepository'
 import { LoginUserUseCase } from '../loginUserUseCase'
 import { AuthenticationError } from '@Commons/exceptions/authenticationError'
@@ -36,11 +36,10 @@ describe('LoginUserUseCase', () => {
       password: 'secret_password',
     }
     const user = new User({
-      id: 'user-123',
       email: useCasePayload.email,
       name: 'John Doe',
       password: 'hashed_password',
-      role: 'admin',
+      role: UserRoles.ADMIN,
     })
 
     const mockValidator: Partial<IValidator<typeof useCasePayload>> = {
@@ -69,11 +68,10 @@ describe('LoginUserUseCase', () => {
       password: 'secret_password',
     }
     const user = new User({
-      id: 'user-123',
       email: useCasePayload.email,
       name: 'John Doe',
       password: useCasePayload.password,
-      role: 'admin',
+      role: UserRoles.ADMIN,
     })
 
     const mockValidator: Partial<IValidator<typeof useCasePayload>> = {

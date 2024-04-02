@@ -1,4 +1,4 @@
-import { User } from '@Domains/entitites/user'
+import { User, UserRoles } from '@Domains/entitites/user'
 import { createApp } from '@Infrastructures/http/express/app'
 import * as request from 'supertest'
 import { UsersTableTestHelper } from '../helpers/usersTableTestHelper'
@@ -46,11 +46,10 @@ describe('/auth', () => {
         password: 'non_matching_password',
       }
       const user = new User({
-        id: 'user-123',
         email: requestPayload.email,
         name: 'John Doe',
         password: 'secret_password',
-        role: 'admin',
+        role: UserRoles.ADMIN,
       })
 
       await usersTableTestHelper.addUser(user)
@@ -68,11 +67,10 @@ describe('/auth', () => {
         password: 'secret_password',
       }
       const user = new User({
-        id: 'user-123',
         email: requestPayload.email,
         name: 'John Doe',
         password: requestPayload.password,
-        role: 'admin',
+        role: UserRoles.ADMIN,
       })
 
       await usersTableTestHelper.addUser(user)

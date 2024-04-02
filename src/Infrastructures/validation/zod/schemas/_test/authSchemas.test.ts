@@ -1,10 +1,11 @@
-import { LoginSchema } from '../authSchemas'
+import { LoginUserSchema } from '../authSchemas'
 
 describe('authSchemas', () => {
   describe('LoginSchema', () => {
     it('should invalidates when object is empty', () => {
       const payload = {}
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(false)
     })
@@ -14,7 +15,8 @@ describe('authSchemas', () => {
         email: 'example@mail',
         password: 'secret',
       }
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(false)
     })
@@ -24,7 +26,8 @@ describe('authSchemas', () => {
         email: 'a'.repeat(51),
         password: 'secret',
       }
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(false)
     })
@@ -34,7 +37,8 @@ describe('authSchemas', () => {
         email: 'example@mail.com',
         password: 'secret',
       }
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(false)
     })
@@ -44,7 +48,8 @@ describe('authSchemas', () => {
         email: 'example@mail.com',
         password: 'a'.repeat(51),
       }
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(false)
     })
@@ -54,7 +59,8 @@ describe('authSchemas', () => {
         email: 'example@mail.com',
         password: 'secret_password',
       }
-      const { success } = LoginSchema.safeParse(payload)
+
+      const { success } = LoginUserSchema.safeParse(payload)
 
       expect(success).toEqual(true)
     })

@@ -1,17 +1,22 @@
 import { pool } from '@Infrastructures/database/postgres/pool'
 import { UsersTableTestHelper } from '../../../../test/helpers/usersTableTestHelper'
 import { UserRepositoryPostgres } from '../userRepositoryPostgres'
-import { User } from '@Domains/entitites/user'
+import { User, UserRoles } from '@Domains/entitites/user'
 
 describe('UserRepositoryPostgres', () => {
   let usersTableTestHelper: UsersTableTestHelper
+  let userRepositoryPostgres: UserRepositoryPostgres
 
   beforeAll(() => {
     usersTableTestHelper = new UsersTableTestHelper(pool)
   })
 
+  beforeEach(() => {
+    userRepositoryPostgres = new UserRepositoryPostgres(pool)
+  })
+
   afterEach(async () => {
-    usersTableTestHelper.cleanTable()
+    await usersTableTestHelper.cleanTable()
   })
 
   afterAll(async () => {
@@ -20,8 +25,6 @@ describe('UserRepositoryPostgres', () => {
 
   describe('findByEmail', () => {
     it('should return null when user not found', async () => {
-      const userRepositoryPostgres = new UserRepositoryPostgres(pool)
-
       const result = await userRepositoryPostgres.findByEmail('example@mail.com')
 
       expect(result).toBeNull()
@@ -29,15 +32,12 @@ describe('UserRepositoryPostgres', () => {
 
     it('should return user correctly', async () => {
       const user = new User({
-        id: 'user-123',
         name: 'John Doe',
         email: 'johndoe@mail.com',
         password: 'secret_password',
-        role: 'admin',
+        role: UserRoles.ADMIN,
       })
-
       await usersTableTestHelper.addUser(user)
-      const userRepositoryPostgres = new UserRepositoryPostgres(pool)
 
       const result = await userRepositoryPostgres.findByEmail(user.email)
 
