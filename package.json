@@ -11,8 +11,8 @@
     "test:cov": "jest --coverage",
     "migrate": "node-pg-migrate --tsconfig tsconfig.json --envPath .env.development.local",
     "migrate:test": "node-pg-migrate --tsconfig tsconfig.json --envPath .env.test.local",
-    "lint": "eslint src --ext .ts",
-    "lint:fix": "eslint src --ext .ts --fix",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --ext .ts --fix .",
     "format": "prettier --write \"src/**/*.ts\" \"migrations/**/*.ts\" \"test/**/*.test.ts\"",
     "seed": "NODE_ENV=development ts-node -r tsconfig-paths/register seeder"
   },
