@@ -1,9 +1,14 @@
-import { ClientError } from '@Commons/exceptions/clientError'
+import { ClientError } from '@Commons/exceptions/ClientError'
 import { winstonLogger } from '@Infrastructures/loggers/winstonLogger'
 import { type NextFunction, type Request, type Response } from 'express'
 import * as httpStatus from 'http-status'
 
-export function errorMiddleware(err: unknown, req: Request, res: Response, next: NextFunction) {
+export function errorMiddleware(
+  err: unknown,
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): void {
   if (err instanceof Error) {
     winstonLogger.error(err)
 

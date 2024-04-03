@@ -1,4 +1,4 @@
-import { type LoginUserUseCase } from '@Applications/use_cases/loginUserUseCase'
+import { type LoginUserUseCase } from '@Applications/use_cases/LoginUserUseCase'
 import { Router } from 'express'
 
 export const authRoutes = Router()

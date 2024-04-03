@@ -7,7 +7,7 @@ import { awilixContainer } from '@Infrastructures/containers/awilixContainer'
 const app = createApp(awilixContainer)
 const server = http.createServer(app)
 
-async function start() {
+async function start(): Promise<void> {
   server.listen(config.app.port, () => {
     winstonLogger.info(`listening on :${config.app.port}`)
   })

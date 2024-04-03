@@ -9,11 +9,11 @@ import {
   TEST_ENV,
 } from '@Commons/constants'
 
-function getFormat() {
+function getFormat(): winston.Logform.Format {
   return winston.format.combine(winston.format.json(), winston.format.prettyPrint())
 }
 
-function getTransports() {
+function getTransports(): winston.transports.ConsoleTransportInstance[] {
   const transports = [new winston.transports.Console()]
   return transports
 }

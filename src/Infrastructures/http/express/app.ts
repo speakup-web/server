@@ -5,7 +5,7 @@ import { errorMiddleware } from './middlewares/errorMiddleware'
 import { loggerMiddleware } from './middlewares/loggerMiddleware'
 import { type AwilixContainer } from 'awilix'
 
-export function createApp(container: AwilixContainer) {
+export function createApp(container: AwilixContainer): express.Express {
   const app = express()
 
   app.use(express.json())

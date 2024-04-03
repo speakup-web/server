@@ -5,7 +5,7 @@ import * as fs from 'fs'
 import * as bcrypt from 'bcrypt'
 import { pool } from '@Infrastructures/database/postgres/pool'
 
-async function processFile(fileName: string, dataFolderPath: string) {
+async function processFile(fileName: string, dataFolderPath: string): Promise<string> {
   const tableName = fileName.split('.')[0]
   const filePath = path.join(dataFolderPath, fileName)
   const jsonData = fs.readFileSync(filePath, 'utf-8')
@@ -28,7 +28,7 @@ async function processFile(fileName: string, dataFolderPath: string) {
   return query
 }
 
-async function seedData() {
+async function seedData(): Promise<void> {
   try {
     const dataFolderPath = path.join(process.cwd(), 'seeder', 'data')
     const files = fs.readdirSync(dataFolderPath)

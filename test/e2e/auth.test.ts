@@ -1,11 +1,12 @@
-import { User, UserRoles } from '@Domains/entitites/user'
 import { createApp } from '@Infrastructures/http/express/app'
 import * as request from 'supertest'
-import { UsersTableTestHelper } from '../helpers/usersTableTestHelper'
+import { UsersTableTestHelper } from '../helpers/UsersTableTestHelper'
 import * as httpStatus from 'http-status'
 import { pool } from '@Infrastructures/database/postgres/pool'
 import { awilixContainer } from '@Infrastructures/containers/awilixContainer'
 import { type Express } from 'express'
+import { UserBuilder } from '@Domains/entities/User/UserBuilder'
+import { UserRole } from '@Domains/enums/UserRole'
 
 describe('/auth', () => {
   describe('POST /auth/login', () => {
@@ -45,13 +46,12 @@ describe('/auth', () => {
         email: 'johndoe@mail.com',
         password: 'non_matching_password',
       }
-      const user = new User({
-        email: requestPayload.email,
-        name: 'John Doe',
-        password: 'secret_password',
-        role: UserRoles.ADMIN,
-      })
-
+      const user = new UserBuilder(
+        'John Doe',
+        requestPayload.email,
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
       await usersTableTestHelper.addUser(user)
 
       const response = await request(app).post('/api/auth/login').send(requestPayload)
@@ -63,16 +63,15 @@ describe('/auth', () => {
 
     it('should response 200 when logging with valid credentials', async () => {
       const requestPayload = {
-        email: 'johndoe@mail.com',
+        email: 'johndoe1@mail.com',
         password: 'secret_password',
       }
-      const user = new User({
-        email: requestPayload.email,
-        name: 'John Doe',
-        password: requestPayload.password,
-        role: UserRoles.ADMIN,
-      })
-
+      const user = new UserBuilder(
+        'John Doe',
+        requestPayload.email,
+        requestPayload.password,
+        UserRole.ADMIN,
+      ).build()
       await usersTableTestHelper.addUser(user)
 
       const response = await request(app).post('/api/auth/login').send(requestPayload)

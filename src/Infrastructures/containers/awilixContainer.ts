@@ -4,28 +4,23 @@ import { pool } from '@Infrastructures/database/postgres/pool'
 import * as jose from 'jose'
 import * as bcrypt from 'bcrypt'
 // Importing the validation schemas
-import { LoginUserSchema } from '@Infrastructures/validation/zod/schemas/authSchemas'
+import { LoginUserSchema } from '@Infrastructures/validators/zod/schemas/authSchemas'
 // Importing the validator
-import { ZodValidator } from '@Infrastructures/validation/zod/zodValidator'
+import { ZodValidator } from '@Infrastructures/validators/zod/ZodValidator'
 // Importing the repository
-import { UserRepositoryPostgres } from '@Infrastructures/repositories/userRepositoryPostgres'
-import { JwtTokenManager } from '@Infrastructures/security/jwtTokenManager'
+import { UserRepositoryPostgres } from '@Infrastructures/repositories/UserRepositoryPostgres'
+import { JwtTokenManager } from '@Infrastructures/securities/JWTTokenManager'
 // Importing the use cases
-import { LoginUserUseCase } from '@Applications/use_cases/loginUserUseCase'
-import { BcryptHasher } from '@Infrastructures/security/bcryptHasher'
+import { LoginUserUseCase } from '@Applications/use_cases/LoginUserUseCase'
+import { BcryptHasher } from '@Infrastructures/securities/BcryptHasher'
 
 export const awilixContainer = awilix.createContainer({
   injectionMode: awilix.InjectionMode.CLASSIC,
 })
 
 awilixContainer.register({
-  // Registering the external dependencies
-  pool: awilix.asValue(pool),
-  jwt: awilix.asValue(jose),
-  bcrypt: awilix.asValue(bcrypt),
-
   // Registering the validators
-  loginValidator: awilix.asClass(ZodValidator, {
+  loginValidator: awilix.asClass(ZodValidator<typeof LoginUserSchema>, {
     injector: () => ({
       schema: LoginUserSchema,
     }),
@@ -33,18 +28,18 @@ awilixContainer.register({
 
   // Registering the repository
   userRepository: awilix.asClass(UserRepositoryPostgres, {
-    injector: (instance) => ({
-      pool: instance.resolve('pool'),
+    injector: () => ({
+      pool,
     }),
   }),
   tokenManager: awilix.asClass(JwtTokenManager, {
-    injector: (instance) => ({
-      jwt: instance.resolve('jwt'),
+    injector: () => ({
+      jwt: jose,
     }),
   }),
   hasher: awilix.asClass(BcryptHasher, {
-    injector: (instance) => ({
-      bcrypt: instance.resolve('bcrypt'),
+    injector: () => ({
+      bcrypt,
     }),
   }),
 
