@@ -11,7 +11,7 @@ export class UserBuilder {
   ) {}
 
   public build(): User {
-    const id = nanoid()
+    const id = `user-${nanoid()}`
     return new User(id, this.name, this.email, this.password, this.role)
   }
 }

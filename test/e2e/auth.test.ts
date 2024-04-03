@@ -9,26 +9,26 @@ import { UserBuilder } from '@Domains/entities/User/UserBuilder'
 import { UserRole } from '@Domains/enums/UserRole'
 
 describe('/auth', () => {
+  let usersTableTestHelper: UsersTableTestHelper
+  let app: Express
+
+  beforeAll(() => {
+    usersTableTestHelper = new UsersTableTestHelper(pool)
+  })
+
+  beforeEach(async () => {
+    app = createApp(awilixContainer)
+  })
+
+  afterEach(async () => {
+    await usersTableTestHelper.cleanTable()
+  })
+
+  afterAll(async () => {
+    await pool.end()
+  })
+
   describe('POST /auth/login', () => {
-    let usersTableTestHelper: UsersTableTestHelper
-    let app: Express
-
-    beforeAll(() => {
-      usersTableTestHelper = new UsersTableTestHelper(pool)
-    })
-
-    beforeEach(async () => {
-      app = createApp(awilixContainer)
-    })
-
-    afterEach(async () => {
-      await usersTableTestHelper.cleanTable()
-    })
-
-    afterAll(async () => {
-      await pool.end()
-    })
-
     it('should response 400 when request payload not contain needed property', async () => {
       const requestPayload = {
         email: 'example@mail',

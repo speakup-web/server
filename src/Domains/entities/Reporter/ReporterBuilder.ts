@@ -9,7 +9,7 @@ export class ReporterBuilder {
   ) {}
 
   public build(): Reporter {
-    const id = nanoid()
+    const id = `reporter-${nanoid()}`
     return new Reporter(id, this.name, this.email, this.phone)
   }
 }

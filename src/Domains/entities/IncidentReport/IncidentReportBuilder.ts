@@ -11,7 +11,7 @@ export class IncidentReportBuilder {
   ) {}
 
   public build(): IncidentReport {
-    const id = nanoid()
+    const id = `report-${nanoid()}`
     return new IncidentReport(
       id,
       this.incidentLocation,

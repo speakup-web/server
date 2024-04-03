@@ -10,13 +10,13 @@ describe('incidentReportSchemas', () => {
       expect(success).toEqual(false)
     })
 
-    it('should invalidates when reporterName is less than 4 characters', () => {
+    it('should invalidates when the date format is invalid', () => {
       const payload = {
-        reporterName: 'a'.repeat(3),
+        reporterName: 'Lorem ipsum',
         reporterEmail: 'example@mail.com',
-        reporterPhone: '081123456789',
+        reporterPhone: '123456789',
         incidentLocation: 'lorem ipsum',
-        incidentDate: new Date(2024, 8 - 1, 20),
+        incidentDate: '2021/13/23',
         incidentDetail: 'lorem ipsum dolor sit amet consectetur',
       }
 
@@ -46,7 +46,7 @@ describe('incidentReportSchemas', () => {
         reporterEmail: 'example@mail.com',
         reporterPhone: '+6281123456789',
         incidentLocation: 'lorem ipsum',
-        incidentDate: new Date(2024, 8 - 1, 20),
+        incidentDate: new Date(2023, 8 - 1, 20),
         incidentDetail: 'lorem ipsum dolor sit amet consectetur',
       }
 
