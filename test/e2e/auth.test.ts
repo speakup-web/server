@@ -1,7 +1,7 @@
 import { createApp } from '@Infrastructures/http/express/app'
-import * as request from 'supertest'
+import request from 'supertest'
 import { UsersTableTestHelper } from '../helpers/UsersTableTestHelper'
-import * as httpStatus from 'http-status'
+import httpStatus from 'http-status'
 import { pool } from '@Infrastructures/database/postgres/pool'
 import { awilixContainer } from '@Infrastructures/containers/awilixContainer'
 import { type Express } from 'express'
@@ -41,7 +41,20 @@ describe('/auth', () => {
       expect(response.body).toHaveProperty('message')
     })
 
-    it('should response 401 if password does not match', async () => {
+    it('should response 401 when email is not found', async () => {
+      const requestPayload = {
+        email: 'johndoe@mail.com',
+        password: 'secret_password',
+      }
+
+      const response = await request(app).post('/api/auth/login').send(requestPayload)
+
+      expect(response.status).toEqual(httpStatus.UNAUTHORIZED)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 401 when password does not match', async () => {
       const requestPayload = {
         email: 'johndoe@mail.com',
         password: 'non_matching_password',

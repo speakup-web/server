@@ -1,4 +1,4 @@
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 import { BcryptHasher } from '../BcryptHasher'
 
 describe('BcryptHasher', () => {

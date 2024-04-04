@@ -1,8 +1,8 @@
-import * as awilix from 'awilix'
+import { createContainer, asClass, InjectionMode } from 'awilix'
 // Importing the external dependencies
 import { pool } from '@Infrastructures/database/postgres/pool'
 import * as jose from 'jose'
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 // Importing the validation schemas
 import { LoginUserSchema } from '@Infrastructures/validators/zod/schemas/authSchemas'
 import { CreateNewIncidentReportSchema } from '@Infrastructures/validators/zod/schemas/incidentReportSchemas'
@@ -18,65 +18,52 @@ import { CreateNewIncidentReportUseCase } from '@Applications/use_cases/CreateNe
 import { ReporterRepositoryPostgres } from '@Infrastructures/repositories/ReporterRepositoryPostgres'
 import { IncidentReportRepositoryPostgres } from '@Infrastructures/repositories/IncidentReportRepositoryPostgres'
 
-export const awilixContainer = awilix.createContainer({
-  injectionMode: awilix.InjectionMode.CLASSIC,
+export const awilixContainer = createContainer({
+  injectionMode: InjectionMode.CLASSIC,
 })
 
 awilixContainer.register({
   // Registering the validators
-  loginUserValidator: awilix.asClass(ZodValidator<typeof LoginUserSchema>, {
+  loginUserValidator: asClass(ZodValidator<typeof LoginUserSchema>, {
     injector: () => ({
       schema: LoginUserSchema,
     }),
   }),
-  createNewIncidentReportValidator: awilix.asClass(
-    ZodValidator<typeof CreateNewIncidentReportSchema>,
-    {
-      injector: () => ({
-        schema: CreateNewIncidentReportSchema,
-      }),
-    },
-  ),
+  createNewIncidentReportValidator: asClass(ZodValidator<typeof CreateNewIncidentReportSchema>, {
+    injector: () => ({
+      schema: CreateNewIncidentReportSchema,
+    }),
+  }),
 
   // Registering the repository
-  userRepository: awilix
-    .asClass(UserRepositoryPostgres, {
-      injector: () => ({
-        pool,
-      }),
-    })
-    .singleton(),
-  tokenManager: awilix
-    .asClass(JwtTokenManager, {
-      injector: () => ({
-        jwt: jose,
-      }),
-    })
-    .singleton(),
-  hasher: awilix
-    .asClass(BcryptHasher, {
-      injector: () => ({
-        bcrypt,
-      }),
-    })
-    .singleton(),
-  reporterRepository: awilix
-    .asClass(ReporterRepositoryPostgres, {
-      injector: () => ({
-        pool,
-      }),
-    })
-    .singleton(),
-  incidentReportRepository: awilix
-    .asClass(IncidentReportRepositoryPostgres, {
-      injector: () => ({
-        pool,
-      }),
-    })
-    .singleton(),
+  userRepository: asClass(UserRepositoryPostgres, {
+    injector: () => ({
+      pool,
+    }),
+  }).singleton(),
+  tokenManager: asClass(JwtTokenManager, {
+    injector: () => ({
+      jwt: jose,
+    }),
+  }).singleton(),
+  hasher: asClass(BcryptHasher, {
+    injector: () => ({
+      bcrypt,
+    }),
+  }).singleton(),
+  reporterRepository: asClass(ReporterRepositoryPostgres, {
+    injector: () => ({
+      pool,
+    }),
+  }).singleton(),
+  incidentReportRepository: asClass(IncidentReportRepositoryPostgres, {
+    injector: () => ({
+      pool,
+    }),
+  }).singleton(),
 
   // Registering the use cases
-  loginUserUseCase: awilix.asClass(LoginUserUseCase, {
+  loginUserUseCase: asClass(LoginUserUseCase, {
     injector: (instance) => ({
       validator: instance.resolve('loginUserValidator'),
       userRepository: instance.resolve('userRepository'),
@@ -84,7 +71,7 @@ awilixContainer.register({
       hasher: instance.resolve('hasher'),
     }),
   }),
-  createNewIncidentReportUseCase: awilix.asClass(CreateNewIncidentReportUseCase, {
+  createNewIncidentReportUseCase: asClass(CreateNewIncidentReportUseCase, {
     injector: (instance) => ({
       validator: instance.resolve('createNewIncidentReportValidator'),
       reporterRepository: instance.resolve('reporterRepository'),

@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import * as winston from 'winston'
+import winston from 'winston'
 import {
   DEBUG_LOGGING_LVL,
   INFO_LOGGING_LVL,

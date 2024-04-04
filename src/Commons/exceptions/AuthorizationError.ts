@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import * as httpStatus from 'http-status'
+import httpStatus from 'http-status'
 import { ClientError } from './ClientError'
 
 export class AuthorizationError extends ClientError {

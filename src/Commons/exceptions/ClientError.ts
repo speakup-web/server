@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import * as httpStatus from 'http-status'
+import httpStatus from 'http-status'
 
 export class ClientError extends Error {
   constructor(

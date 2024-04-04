@@ -1,5 +1,5 @@
-import * as request from 'supertest'
-import * as httpStatus from 'http-status'
+import request from 'supertest'
+import httpStatus from 'http-status'
 import { createApp } from '../app'
 import { type AwilixContainer } from 'awilix'
 

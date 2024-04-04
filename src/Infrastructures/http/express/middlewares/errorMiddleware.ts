@@ -1,7 +1,7 @@
 import { ClientError } from '@Commons/exceptions/ClientError'
 import { winstonLogger } from '@Infrastructures/loggers/winstonLogger'
 import { type NextFunction, type Request, type Response } from 'express'
-import * as httpStatus from 'http-status'
+import httpStatus from 'http-status'
 
 export function errorMiddleware(
   err: unknown,

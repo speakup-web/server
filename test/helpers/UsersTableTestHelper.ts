@@ -3,7 +3,7 @@
 import { type User } from '@Domains/entities/User/User'
 import { BcryptHasher } from '@Infrastructures/securities/BcryptHasher'
 import { type Pool, type QueryConfig } from 'pg'
-import * as bcrypt from 'bcrypt'
+import bcrypt from 'bcrypt'
 
 export class UsersTableTestHelper {
   constructor(private readonly pool: Pool) {}

@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import * as dotenv from 'dotenv'
+import dotenv from 'dotenv'
 import { resolve } from 'path'
 
 dotenv.config({
