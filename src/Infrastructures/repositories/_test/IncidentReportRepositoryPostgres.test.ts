@@ -30,6 +30,31 @@ describe('IncidentReportRepositoryPostgres', () => {
     await pool.end()
   })
 
+  describe('findById', () => {
+    it('should return null when incident report not found', async () => {
+      const id = 'xxx'
+      const incidentReport = await incidentReportRepositoryPostgres.findById(id)
+      expect(incidentReport).toBeNull()
+    })
+
+    it('should return incident report when found', async () => {
+      const reporter = new ReporterBuilder('John Doe', 'johndoe@mail.com', '081123456789').build()
+      const incidentReport = new IncidentReportBuilder(
+        'lorem ipsum dolor sit amet',
+        new Date('2024-01-01'),
+        'lorem ipsum dolor sit amet consectetur adipiscing elit',
+        IncidentStatus.SUBMITED,
+        reporter,
+      ).build()
+      await reportersTableTestHelper.addReporter(reporter)
+      await incidentReportsTableTestHelper.addIncidentReport(incidentReport)
+
+      const result = await incidentReportRepositoryPostgres.findById(incidentReport.id)
+
+      expect(result).toStrictEqual(incidentReport)
+    })
+  })
+
   describe('findAll', () => {
     it('should return all incident reports', async () => {
       const reporter1 = new ReporterBuilder(

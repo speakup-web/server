@@ -120,4 +120,17 @@ describe('incidentReportSchemas', () => {
       expect(success).toEqual(true)
     })
   })
+
+  describe('GetIncidentReportDetailSchema', () => {
+    it('should validates when paylad is correct', () => {
+      const payload = {
+        reportId: 'report-123',
+        isAuthenticated: false,
+      }
+
+      const { success } = GetAllIncidentReportsSchema.safeParse(payload)
+
+      expect(success).toEqual(true)
+    })
+  })
 })
