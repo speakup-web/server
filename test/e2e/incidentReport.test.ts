@@ -9,6 +9,7 @@ import { pool } from '@Infrastructures/database/postgres/pool'
 import { UserBuilder } from '@Domains/entities/User/UserBuilder'
 import { UserRole } from '@Domains/enums/UserRole'
 import { UsersTableTestHelper } from '../helpers/UsersTableTestHelper'
+import { IncidentStatus } from '@Domains/enums/IncidentStatus'
 
 describe('/incident-reports', () => {
   let app: Express
@@ -215,6 +216,96 @@ describe('/incident-reports', () => {
         'id',
         createNewIncidentReportResponse.body.data.reportId,
       )
+    })
+  })
+
+  describe('GET /incident-reports/stats', () => {
+    it('should response 401 when request without token', async () => {
+      const response = await request(app).get('/api/incident-reports/stats')
+
+      expect(response.status).toEqual(httpStatus.UNAUTHORIZED)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 401 when request with invalid token', async () => {
+      const response = await request(app)
+        .get('/api/incident-reports/stats')
+        .set('Authorization', 'Bearer invalid-token')
+
+      expect(response.status).toEqual(httpStatus.UNAUTHORIZED)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 200 when request with valid token', async () => {
+      const taskforce = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(taskforce)
+
+      const createNewIncidentReportResponse1 = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'lorem ipsum',
+          incidentDate: '2023-05-04',
+          incidentDetail: 'lorem ipsum dolor sit amet consectetur',
+        })
+      const createNewIncidentReportResponse2 = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'Jane Smith',
+          reporterEmail: 'jane@example.com',
+          reporterPhone: '081234567890',
+          incidentLocation: 'Lorem ipsum dolor sit amet',
+          incidentDate: '2023-06-15',
+          incidentDetail: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
+        })
+      const createNewIncidentReportResponse3 = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'Consectetur adipiscing elit',
+          incidentDate: '2023-07-20',
+          incidentDetail: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        })
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse1.body.data.reportId,
+        IncidentStatus.ON_PROGRESS,
+      )
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse2.body.data.reportId,
+        IncidentStatus.ON_PROGRESS,
+      )
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse3.body.data.reportId,
+        IncidentStatus.DONE,
+      )
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: taskforce.email,
+        password: taskforce.password,
+      })
+
+      const response = await request(app)
+        .get('/api/incident-reports/stats')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty('totalReporters', 2)
+      expect(response.body.data).toHaveProperty('submitedReports', 3)
+      expect(response.body.data).toHaveProperty('onProgressReports', 2)
+      expect(response.body.data).toHaveProperty('doneReports', 1)
     })
   })
 })

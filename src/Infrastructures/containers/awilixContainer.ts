@@ -20,7 +20,8 @@ import { LoginUserUseCase } from '@Applications/use_cases/LoginUserUseCase'
 import { CreateNewIncidentReportUseCase } from '@Applications/use_cases/CreateNewIncidentReportUseCase'
 import { ReporterRepositoryPostgres } from '@Infrastructures/repositories/ReporterRepositoryPostgres'
 import { IncidentReportRepositoryPostgres } from '@Infrastructures/repositories/IncidentReportRepositoryPostgres'
-import { GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReports'
+import { GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReportsUseCase'
+import { GetIncidentReportStatsUseCase } from '@Applications/use_cases/GetIncidentReportStatsUseCase'
 
 export const awilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -90,6 +91,11 @@ awilixContainer.register({
   getAllIncidentReportsUseCase: asClass(GetAllIncidentReportsUseCase, {
     injector: (instance) => ({
       validator: instance.resolve('getAllIncidentReportsValidator'),
+      incidentReportRepository: instance.resolve('incidentReportRepository'),
+    }),
+  }),
+  getIncidentReportStatsUseCase: asClass(GetIncidentReportStatsUseCase, {
+    injector: (instance) => ({
       incidentReportRepository: instance.resolve('incidentReportRepository'),
     }),
   }),

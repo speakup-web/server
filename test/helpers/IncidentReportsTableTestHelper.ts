@@ -2,6 +2,7 @@
 
 import { IncidentReport } from '@Domains/entities/IncidentReport/IncidentReport'
 import { Reporter } from '@Domains/entities/Reporter/Reporter'
+import { type IncidentStatus } from '@Domains/enums/IncidentStatus'
 import { type QueryConfig, type Pool } from 'pg'
 
 export class IncidentReportsTableTestHelper {
@@ -31,6 +32,17 @@ export class IncidentReportsTableTestHelper {
         incidentReport.incidentStatus,
         incidentReport.reporter.id,
       ],
+    }
+
+    await this.pool.query(query)
+  }
+
+  public async setIncidentReportStatus(id: string, status: IncidentStatus): Promise<void> {
+    const query: QueryConfig = {
+      text: `UPDATE incident_reports
+             SET incident_status = $1
+             WHERE id = $2`,
+      values: [status, id],
     }
 
     await this.pool.query(query)

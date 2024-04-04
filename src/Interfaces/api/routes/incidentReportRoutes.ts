@@ -1,5 +1,6 @@
 import { type CreateNewIncidentReportUseCase } from '@Applications/use_cases/CreateNewIncidentReportUseCase'
-import { type GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReports'
+import { type GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReportsUseCase'
+import { type GetIncidentReportStatsUseCase } from '@Applications/use_cases/GetIncidentReportStatsUseCase'
 import { UserRole } from '@Domains/enums/UserRole'
 import { authenticationMiddleware } from '@Infrastructures/http/express/middlewares/authenticationMiddleware'
 import { authorizeMiddleware } from '@Infrastructures/http/express/middlewares/authorizeMiddleware'
@@ -41,6 +42,24 @@ incidentReportRoutes.get(
       limit: req.query.limit,
       status: req.query.status,
     })
+
+    res.json({
+      status: 'success',
+      data,
+    })
+  },
+)
+
+incidentReportRoutes.get(
+  '/stats',
+  authenticationMiddleware,
+  authorizeMiddleware([UserRole.ADMIN, UserRole.TASKFORCE]),
+  async (req: Request, res: Response) => {
+    const getIncidentReportStatsUseCase = req.container.resolve<GetIncidentReportStatsUseCase>(
+      'getIncidentReportStatsUseCase',
+    )
+
+    const data = await getIncidentReportStatsUseCase.execute()
 
     res.json({
       status: 'success',

@@ -60,11 +60,8 @@ describe('IncidentReportRepositoryPostgres', () => {
       await reportersTableTestHelper.addReporter(reporter2)
       await incidentReportsTableTestHelper.addIncidentReport(incidentReport1)
       await incidentReportsTableTestHelper.addIncidentReport(incidentReport2)
-      const limit = 20
-      const offset = 0
-      const status = undefined
 
-      const incidentReports = await incidentReportRepositoryPostgres.findAll(limit, offset, status)
+      const incidentReports = await incidentReportRepositoryPostgres.findAll()
 
       expect(incidentReports).toHaveLength(2)
       expect(incidentReports[0]).toStrictEqual(incidentReport2)

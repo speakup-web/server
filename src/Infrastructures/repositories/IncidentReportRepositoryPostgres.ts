@@ -7,9 +7,9 @@ export class IncidentReportRepositoryPostgres implements IIncidentReportReposito
   constructor(private readonly pool: Pool) {}
 
   public async findAll(
-    limit: number,
-    offset: number,
-    status?: string | undefined,
+    limit?: number,
+    offset?: number,
+    status?: string,
   ): Promise<IncidentReport[]> {
     let text = `SELECT
                   ir.id,
@@ -23,19 +23,26 @@ export class IncidentReportRepositoryPostgres implements IIncidentReportReposito
                   r.phone AS "reporterPhone"
                 FROM incident_reports AS ir
                 JOIN reporters AS r ON ir.reporter_id = r.id
-                WHERE 1=1 `
+                WHERE 1=1`
 
     const values: any[] = []
 
     if (status) {
-      text += `AND ir.incident_status = $${values.length + 1} `
+      text += ` AND ir.incident_status = $${values.length + 1}`
       values.push(status)
     }
 
-    text += `ORDER BY ir.incident_date DESC
-             LIMIT $${values.length + 1} OFFSET $${values.length + 2}`
+    text += ' ORDER BY ir.incident_date DESC'
 
-    values.push(limit, offset)
+    if (limit !== undefined) {
+      text += ` LIMIT $${values.length + 1}`
+      values.push(limit)
+    }
+
+    if (offset !== undefined) {
+      text += ` OFFSET $${values.length + 1}`
+      values.push(offset)
+    }
 
     const query: QueryConfig = {
       text,
