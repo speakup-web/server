@@ -4,6 +4,7 @@ import { type IReporterRepository } from '@Domains/repositories/IReporterReposit
 import { IncidentReportBuilder } from '@Domains/entities/IncidentReport/IncidentReportBuilder'
 import { ReporterBuilder } from '@Domains/entities/Reporter/ReporterBuilder'
 import { IncidentStatus } from '@Domains/enums/IncidentStatus'
+import { ConflictError } from '@Commons/exceptions/ConflictError'
 
 interface UseCasePayload {
   reporterName: string
@@ -28,20 +29,35 @@ export class CreateNewIncidentReportUseCase {
   async execute(useCasePayload: unknown): Promise<UseCaseResult> {
     const payload = this.validator.validate(useCasePayload)
 
-    const reporter = new ReporterBuilder(
-      payload.reporterName,
+    let reporter = await this.reporterRepository.findByEmailOrPhone(
       payload.reporterEmail,
       payload.reporterPhone,
-    ).build()
+    )
+
+    if (reporter) {
+      if (reporter.email !== payload.reporterEmail || reporter.phone !== payload.reporterPhone) {
+        throw new ConflictError(
+          'Reporter with same email or phone has registered with different information.',
+        )
+      }
+    } else {
+      reporter = new ReporterBuilder(
+        payload.reporterName,
+        payload.reporterEmail,
+        payload.reporterPhone,
+      ).build()
+
+      await this.reporterRepository.save(reporter)
+    }
+
     const incidentReport = new IncidentReportBuilder(
       payload.incidentLocation,
       payload.incidentDate,
       payload.incidentDetail,
       IncidentStatus.SUBMITED,
-      reporter.id,
+      reporter,
     ).build()
 
-    await this.reporterRepository.save(reporter)
     await this.incidentReportRepository.save(incidentReport)
 
     const result: UseCaseResult = {

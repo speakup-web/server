@@ -18,7 +18,7 @@ export class UserRepositoryPostgres implements IUserRepository {
       values: [email],
     }
 
-    const { rows, rowCount } = await this.pool.query<User>(query)
+    const { rows, rowCount } = await this.pool.query(query)
 
     if (!rowCount) {
       return null

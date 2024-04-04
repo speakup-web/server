@@ -1,5 +1,9 @@
 import { type CreateNewIncidentReportUseCase } from '@Applications/use_cases/CreateNewIncidentReportUseCase'
-import { Router } from 'express'
+import { type GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReports'
+import { UserRole } from '@Domains/enums/UserRole'
+import { authenticationMiddleware } from '@Infrastructures/http/express/middlewares/authenticationMiddleware'
+import { authorizeMiddleware } from '@Infrastructures/http/express/middlewares/authorizeMiddleware'
+import { type Request, type Response, Router } from 'express'
 
 export const incidentReportRoutes = Router()
 
@@ -22,3 +26,25 @@ incidentReportRoutes.post('/', async (req, res) => {
     data,
   })
 })
+
+incidentReportRoutes.get(
+  '/',
+  authenticationMiddleware,
+  authorizeMiddleware([UserRole.ADMIN, UserRole.TASKFORCE]),
+  async (req: Request, res: Response) => {
+    const getAllIncidentReportsUseCase = req.container.resolve<GetAllIncidentReportsUseCase>(
+      'getAllIncidentReportsUseCase',
+    )
+
+    const data = await getAllIncidentReportsUseCase.execute({
+      offset: req.query.offset,
+      limit: req.query.limit,
+      status: req.query.status,
+    })
+
+    res.json({
+      status: 'success',
+      data,
+    })
+  },
+)

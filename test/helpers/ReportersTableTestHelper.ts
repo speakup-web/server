@@ -26,14 +26,14 @@ export class ReportersTableTestHelper {
     await this.pool.query(query)
   }
 
-  public async findReporters(): Promise<Reporter[] | null> {
+  public async findReporters(): Promise<Reporter[]> {
     const query = `SELECT id, name, email, phone
                    FROM reporters`
 
-    const { rowCount, rows } = await this.pool.query<Reporter>(query)
+    const { rowCount, rows } = await this.pool.query(query)
 
     if (!rowCount) {
-      return null
+      return []
     }
 
     const reporters = rows.map((row) => new Reporter(row.id, row.name, row.email, row.phone))
