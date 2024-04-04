@@ -8,6 +8,6 @@ export class IncidentReport {
     public readonly incidentDate: Date,
     public readonly incidentDetail: string,
     public readonly incidentStatus: IncidentStatus,
-    public readonly reporterId: Reporter['id'],
+    public readonly reporter: Reporter,
   ) {}
 }

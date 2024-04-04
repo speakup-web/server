@@ -1,3 +1,4 @@
+import { IncidentStatus } from '@Domains/enums/IncidentStatus'
 import { z } from 'zod'
 
 export const CreateNewIncidentReportSchema = z.object({
@@ -7,4 +8,10 @@ export const CreateNewIncidentReportSchema = z.object({
   incidentLocation: z.string().min(4),
   incidentDate: z.coerce.date().max(new Date()),
   incidentDetail: z.string().min(15),
+})
+
+export const GetAllIncidentReportsSchema = z.object({
+  limit: z.coerce.number().int().min(1).max(20).default(20),
+  offset: z.coerce.number().int().min(0).default(0),
+  status: z.nativeEnum(IncidentStatus).optional(),
 })

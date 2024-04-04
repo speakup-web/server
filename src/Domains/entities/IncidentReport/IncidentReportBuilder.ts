@@ -7,7 +7,7 @@ export class IncidentReportBuilder {
     private readonly incidentDate: IncidentReport['incidentDate'],
     private readonly incidentDetail: IncidentReport['incidentDetail'],
     private readonly incidentStatus: IncidentReport['incidentStatus'],
-    private readonly reporterId: IncidentReport['reporterId'],
+    private readonly reporterId: IncidentReport['reporter'],
   ) {}
 
   public build(): IncidentReport {

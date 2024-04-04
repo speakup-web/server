@@ -1,9 +1,83 @@
-import { type IncidentReport } from '@Domains/entities/IncidentReport/IncidentReport'
+import { IncidentReport } from '@Domains/entities/IncidentReport/IncidentReport'
+import { Reporter } from '@Domains/entities/Reporter/Reporter'
 import { type IIncidentReportRepository } from '@Domains/repositories/IIncidentReportRepository'
 import { type Pool, type QueryConfig } from 'pg'
 
 export class IncidentReportRepositoryPostgres implements IIncidentReportRepository {
   constructor(private readonly pool: Pool) {}
+
+  public async findAll(
+    limit?: number,
+    offset?: number,
+    status?: string,
+  ): Promise<IncidentReport[]> {
+    let text = `SELECT
+                  ir.id,
+                  ir.incident_location AS "incidentLocation",
+                  ir.incident_date AT TIME ZONE 'Asia/Jakarta' AS "incidentDate",
+                  ir.incident_detail AS "incidentDetail",
+                  ir.incident_status AS "incidentStatus",
+                  r.id AS "reporterId",
+                  r.name AS "reporterName",
+                  r.email AS "reporterEmail",
+                  r.phone AS "reporterPhone"
+                FROM incident_reports AS ir
+                JOIN reporters AS r ON ir.reporter_id = r.id
+                WHERE 1=1`
+
+    const values: any[] = []
+
+    if (status) {
+      text += ` AND ir.incident_status = $${values.length + 1}`
+      values.push(status)
+    }
+
+    text += ' ORDER BY ir.incident_date DESC'
+
+    if (limit !== undefined) {
+      text += ` LIMIT $${values.length + 1}`
+      values.push(limit)
+    }
+
+    if (offset !== undefined) {
+      text += ` OFFSET $${values.length + 1}`
+      values.push(offset)
+    }
+
+    const query: QueryConfig = {
+      text,
+      values,
+    }
+
+    const { rowCount, rows } = await this.pool.query(query)
+
+    if (!rowCount) {
+      return []
+    }
+
+    return rows.map((row) => {
+      const reporter = new Reporter(
+        row.reporterId,
+        row.reporterName,
+        row.reporterEmail,
+        row.reporterPhone,
+      )
+      return new IncidentReport(
+        row.id,
+        row.incidentLocation,
+        row.incidentDate,
+        row.incidentDetail,
+        row.incidentStatus,
+        reporter,
+      )
+    })
+  }
+
+  public async countAll(): Promise<number> {
+    const query = 'SELECT COUNT(*) FROM incident_reports'
+    const { rows } = await this.pool.query(query)
+    return parseInt(rows[0].count, 10)
+  }
 
   public async save(incidentReport: IncidentReport): Promise<void> {
     const query: QueryConfig = {
@@ -27,7 +101,7 @@ export class IncidentReportRepositoryPostgres implements IIncidentReportReposito
         incidentReport.incidentDate,
         incidentReport.incidentDetail,
         incidentReport.incidentStatus,
-        incidentReport.reporterId,
+        incidentReport.reporter.id,
       ],
     }
 

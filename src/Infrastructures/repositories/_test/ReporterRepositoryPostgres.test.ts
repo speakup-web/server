@@ -24,6 +24,39 @@ describe('ReporterRepositoryPostgres', () => {
     await pool.end()
   })
 
+  describe('findByEmailOrPhone', () => {
+    it('should return null when reporter not found', async () => {
+      const email = 'example@mail.com'
+      const phone = '081123456789'
+
+      const reporter = await reporterRepositoryPostgres.findByEmailOrPhone(email, phone)
+
+      expect(reporter).toBeNull()
+    })
+
+    it('should return reporter when reporter found', async () => {
+      const reporter = new ReporterBuilder('John Doe', 'johndoe@mail.com', '081123456789').build()
+      await reportersTableTestHelper.addReporter(reporter)
+
+      const foundReporter1 = await reporterRepositoryPostgres.findByEmailOrPhone(
+        reporter.email,
+        '082123456789',
+      )
+      const foundReporter2 = await reporterRepositoryPostgres.findByEmailOrPhone(
+        'john@mail.com',
+        reporter.phone,
+      )
+      const foundReporter3 = await reporterRepositoryPostgres.findByEmailOrPhone(
+        reporter.email,
+        reporter.phone,
+      )
+
+      expect(foundReporter1).toStrictEqual(reporter)
+      expect(foundReporter2).toStrictEqual(reporter)
+      expect(foundReporter3).toStrictEqual(reporter)
+    })
+  })
+
   describe('save', () => {
     it('should save a new reporter', async () => {
       const reporter = new ReporterBuilder('John Doe', 'johndoe@mail.com', '081123456789').build()
@@ -32,7 +65,7 @@ describe('ReporterRepositoryPostgres', () => {
 
       const reporters = await reportersTableTestHelper.findReporters()
       expect(reporters).toHaveLength(1)
-      expect(reporters?.[0]).toStrictEqual(reporter)
+      expect(reporters[0]).toStrictEqual(reporter)
     })
 
     it('should update reporter when reporter already exists', async () => {
@@ -49,7 +82,7 @@ describe('ReporterRepositoryPostgres', () => {
 
       const reporters = await reportersTableTestHelper.findReporters()
       expect(reporters).toHaveLength(1)
-      expect(reporters?.[0]).toStrictEqual(updatedReporter)
+      expect(reporters[0]).toStrictEqual(updatedReporter)
     })
   })
 })

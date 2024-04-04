@@ -1,6 +1,8 @@
 /* istanbul ignore file */
 
 import { IncidentReport } from '@Domains/entities/IncidentReport/IncidentReport'
+import { Reporter } from '@Domains/entities/Reporter/Reporter'
+import { type IncidentStatus } from '@Domains/enums/IncidentStatus'
 import { type QueryConfig, type Pool } from 'pg'
 
 export class IncidentReportsTableTestHelper {
@@ -28,40 +30,60 @@ export class IncidentReportsTableTestHelper {
         incidentReport.incidentDate,
         incidentReport.incidentDetail,
         incidentReport.incidentStatus,
-        incidentReport.reporterId,
+        incidentReport.reporter.id,
       ],
     }
 
     await this.pool.query(query)
   }
 
-  public async findIncidentReports(): Promise<IncidentReport[] | null> {
-    const query = `SELECT
-                      id,
-                      incident_location AS "incidentLocation",
-                      incident_date AT TIME ZONE 'Asia/Jakarta' AS "incidentDate",
-                      incident_detail AS "incidentDetail",
-                      incident_status AS "incidentStatus",
-                      reporter_id AS "reporterId"
-                   FROM incident_reports`
-
-    const { rowCount, rows } = await this.pool.query<IncidentReport>(query)
-
-    if (!rowCount) {
-      return null
+  public async setIncidentReportStatus(id: string, status: IncidentStatus): Promise<void> {
+    const query: QueryConfig = {
+      text: `UPDATE incident_reports
+             SET incident_status = $1
+             WHERE id = $2`,
+      values: [status, id],
     }
 
-    const incidentReports = rows.map(
-      (row) =>
-        new IncidentReport(
-          row.id,
-          row.incidentLocation,
-          row.incidentDate,
-          row.incidentDetail,
-          row.incidentStatus,
-          row.reporterId,
-        ),
-    )
+    await this.pool.query(query)
+  }
+
+  public async findIncidentReports(): Promise<IncidentReport[]> {
+    const query = `SELECT
+                      ir.id,
+                      ir.incident_location AS "incidentLocation",
+                      ir.incident_date AT TIME ZONE 'Asia/Jakarta' AS "incidentDate",
+                      ir.incident_detail AS "incidentDetail",
+                      ir.incident_status AS "incidentStatus",
+                      r.id AS "reporterId",
+                      r.name AS "reporterName",
+                      r.email AS "reporterEmail",
+                      r.phone AS "reporterPhone"
+                   FROM incident_reports AS ir
+                   JOIN reporters AS r ON ir.reporter_id = r.id`
+
+    const { rowCount, rows } = await this.pool.query(query)
+
+    if (!rowCount) {
+      return []
+    }
+
+    const incidentReports = rows.map((row) => {
+      const reporter = new Reporter(
+        row.reporterId,
+        row.reporterName,
+        row.reporterEmail,
+        row.reporterPhone,
+      )
+      return new IncidentReport(
+        row.id,
+        row.incidentLocation,
+        row.incidentDate,
+        row.incidentDetail,
+        row.incidentStatus,
+        reporter,
+      )
+    })
 
     return incidentReports
   }
