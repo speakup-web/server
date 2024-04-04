@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import 'express-async-errors'
 import { routes } from '@Interfaces/api/routes'
 import { errorMiddleware } from './middlewares/errorMiddleware'
@@ -8,6 +9,7 @@ import { type AwilixContainer } from 'awilix'
 export function createApp(container: AwilixContainer): express.Express {
   const app = express()
 
+  app.use(cors())
   app.use(express.json())
   app.use(loggerMiddleware)
 
