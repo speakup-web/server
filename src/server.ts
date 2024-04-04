@@ -1,13 +1,15 @@
-import * as http from 'http'
+import http from 'http'
 import { config } from '@Commons/config'
-import { app } from '@Infrastructures/http/express/app'
-import { logger } from '@Commons/logger'
+import { winstonLogger } from '@Infrastructures/loggers/winstonLogger'
+import { createApp } from '@Infrastructures/http/express/app'
+import { awilixContainer } from '@Infrastructures/containers/awilixContainer'
 
+const app = createApp(awilixContainer)
 const server = http.createServer(app)
 
-async function start() {
+async function start(): Promise<void> {
   server.listen(config.app.port, () => {
-    logger.info(`listening on :${config.app.port}`)
+    winstonLogger.info(`listening on :${config.app.port}`)
   })
 }
 

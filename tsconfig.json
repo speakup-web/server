@@ -17,8 +17,9 @@
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "typeRoots": ["./src/Commons/types", "./node_modules/@types"],
+    "esModuleInterop": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules/**/*"]
+  "include": ["src/**/*", "migrations/*", "seeder/*", "test/**/*"]
 }

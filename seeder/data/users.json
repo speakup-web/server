@@ -1,0 +1,18 @@
+{
+  "users": [
+    {
+      "id": "user-TRf_OwH11AnT3p7S437co",
+      "name": "John Doe",
+      "email": "johndoe@example.com",
+      "password": "johndoe@example.com",
+      "role": "admin"
+    },
+    {
+      "id": "user-Qy2h5lyqScRXsPlIH4hln",
+      "name": "Jane Smith",
+      "email": "janesmith@example.com",
+      "password": "janesmith@example.com",
+      "role": "admin"
+    }
+  ]
+}
