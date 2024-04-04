@@ -20,3 +20,8 @@ export const GetIncidentReportDetailSchema = z.object({
   reportId: z.string(),
   isAuthenticated: z.boolean(),
 })
+
+export const UpdateIncidentReportStatusSchema = z.object({
+  reportId: z.string(),
+  status: z.nativeEnum(IncidentStatus),
+})

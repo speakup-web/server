@@ -9,6 +9,7 @@ import {
   CreateNewIncidentReportSchema,
   GetAllIncidentReportsSchema,
   GetIncidentReportDetailSchema,
+  UpdateIncidentReportStatusSchema,
 } from '@Infrastructures/validators/zod/schemas/incidentReportSchemas'
 // Importing the validator
 import { ZodValidator } from '@Infrastructures/validators/zod/ZodValidator'
@@ -24,6 +25,7 @@ import { IncidentReportRepositoryPostgres } from '@Infrastructures/repositories/
 import { GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllIncidentReportsUseCase'
 import { GetIncidentReportStatsUseCase } from '@Applications/use_cases/GetIncidentReportStatsUseCase'
 import { GetIncidentReportDetailUseCase } from '@Applications/use_cases/GetIncidentReportDetailUseCase'
+import { UpdateIncidentReportStatusUseCase } from '@Applications/use_cases/UpdateIncidentReportStatusUseCase'
 
 export const awilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -49,6 +51,11 @@ awilixContainer.register({
   getIncidentReportDetailSchema: asClass(ZodValidator<typeof GetIncidentReportDetailSchema>, {
     injector: () => ({
       schema: GetIncidentReportDetailSchema,
+    }),
+  }),
+  updateIncidentReportStatusSchema: asClass(ZodValidator<typeof UpdateIncidentReportStatusSchema>, {
+    injector: () => ({
+      schema: UpdateIncidentReportStatusSchema,
     }),
   }),
 
@@ -109,6 +116,12 @@ awilixContainer.register({
   getIncidentReportDetailUseCase: asClass(GetIncidentReportDetailUseCase, {
     injector: (instance) => ({
       validator: instance.resolve('getIncidentReportDetailSchema'),
+      incidentReportRepository: instance.resolve('incidentReportRepository'),
+    }),
+  }),
+  updateIncidentReportStatusUseCase: asClass(UpdateIncidentReportStatusUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('updateIncidentReportStatusSchema'),
       incidentReportRepository: instance.resolve('incidentReportRepository'),
     }),
   }),

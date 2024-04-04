@@ -2,6 +2,7 @@ import { IncidentStatus } from '@Domains/enums/IncidentStatus'
 import {
   CreateNewIncidentReportSchema,
   GetAllIncidentReportsSchema,
+  UpdateIncidentReportStatusSchema,
 } from '../incidentReportSchemas'
 
 describe('incidentReportSchemas', () => {
@@ -108,7 +109,7 @@ describe('incidentReportSchemas', () => {
       expect(success).toEqual(true)
     })
 
-    it('should validates when paylad is correct', () => {
+    it('should validates when payload is correct', () => {
       const payload = {
         limit: '10',
         offset: '0',
@@ -122,13 +123,59 @@ describe('incidentReportSchemas', () => {
   })
 
   describe('GetIncidentReportDetailSchema', () => {
-    it('should validates when paylad is correct', () => {
+    it('should invalidates when reportId is invalid', () => {
+      const payload = {
+        reportId: 1,
+        isAuthenticated: true,
+      }
+
+      const { success } = UpdateIncidentReportStatusSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should validates when payload is correct', () => {
       const payload = {
         reportId: 'report-123',
         isAuthenticated: false,
       }
 
       const { success } = GetAllIncidentReportsSchema.safeParse(payload)
+
+      expect(success).toEqual(true)
+    })
+  })
+
+  describe('UpdateIncidentReportStatus', () => {
+    it('should invalidates when reportId is invalid', () => {
+      const payload = {
+        reportId: 1,
+        status: IncidentStatus.ON_PROGRESS,
+      }
+
+      const { success } = UpdateIncidentReportStatusSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should invalidates when status is invalid', () => {
+      const payload = {
+        reportId: 'report-123',
+        status: 'invalid-status',
+      }
+
+      const { success } = UpdateIncidentReportStatusSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should validates when payload is correct', () => {
+      const payload = {
+        reportId: 'report-123',
+        status: IncidentStatus.ON_PROGRESS,
+      }
+
+      const { success } = UpdateIncidentReportStatusSchema.safeParse(payload)
 
       expect(success).toEqual(true)
     })
