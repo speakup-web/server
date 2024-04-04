@@ -6,6 +6,46 @@ import { type Pool, type QueryConfig } from 'pg'
 export class IncidentReportRepositoryPostgres implements IIncidentReportRepository {
   constructor(private readonly pool: Pool) {}
 
+  public async findById(id: string): Promise<IncidentReport | null> {
+    const query: QueryConfig = {
+      text: `SELECT
+                ir.id,
+                ir.incident_location AS "incidentLocation",
+                ir.incident_date AT TIME ZONE 'Asia/Jakarta' AS "incidentDate",
+                ir.incident_detail AS "incidentDetail",
+                ir.incident_status AS "incidentStatus",
+                r.id AS "reporterId",
+                r.name AS "reporterName",
+                r.email AS "reporterEmail",
+                r.phone AS "reporterPhone"
+             FROM incident_reports AS ir
+             JOIN reporters AS r ON ir.reporter_id = r.id
+             WHERE ir.id = $1`,
+      values: [id],
+    }
+
+    const { rowCount, rows } = await this.pool.query(query)
+
+    if (!rowCount) {
+      return null
+    }
+
+    const reporter = new Reporter(
+      rows[0].reporterId,
+      rows[0].reporterName,
+      rows[0].reporterEmail,
+      rows[0].reporterPhone,
+    )
+    return new IncidentReport(
+      rows[0].id,
+      rows[0].incidentLocation,
+      rows[0].incidentDate,
+      rows[0].incidentDetail,
+      rows[0].incidentStatus,
+      reporter,
+    )
+  }
+
   public async findAll(
     limit?: number,
     offset?: number,

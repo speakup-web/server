@@ -15,3 +15,13 @@ export const GetAllIncidentReportsSchema = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   status: z.nativeEnum(IncidentStatus).optional(),
 })
+
+export const GetIncidentReportDetailSchema = z.object({
+  reportId: z.string(),
+  isAuthenticated: z.boolean(),
+})
+
+export const UpdateIncidentReportStatusSchema = z.object({
+  reportId: z.string(),
+  status: z.nativeEnum(IncidentStatus),
+})

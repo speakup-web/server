@@ -113,6 +113,32 @@ describe('/incident-reports', () => {
   })
 
   describe('GET /incident-reports', () => {
+    it('should response 400 when query is invalid', async () => {
+      const user = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: user.email,
+        password: user.password,
+      })
+
+      const response = await request(app)
+        .get('/api/incident-reports')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .query({
+          status: 'invalid-status',
+        })
+
+      expect(response.status).toEqual(httpStatus.BAD_REQUEST)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
     it('should response 401 when request without token', async () => {
       const response = await request(app).get('/api/incident-reports')
 
@@ -306,6 +332,252 @@ describe('/incident-reports', () => {
       expect(response.body.data).toHaveProperty('submitedReports', 3)
       expect(response.body.data).toHaveProperty('onProgressReports', 2)
       expect(response.body.data).toHaveProperty('doneReports', 1)
+    })
+  })
+
+  describe('GET /incident-reports/{reportId}', () => {
+    it('should response 404 when report not found', async () => {
+      const response = await request(app).get('/api/incident-reports/report-xxx')
+
+      expect(response.status).toEqual(httpStatus.NOT_FOUND)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 200 when report found and without token', async () => {
+      const createNewIncidentReportResponse = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'Consectetur adipiscing elit',
+          incidentDate: '2023-07-20',
+          incidentDetail: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        })
+
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse.body.data.reportId,
+        IncidentStatus.ON_PROGRESS,
+      )
+
+      const response = await request(app).get(
+        `/api/incident-reports/${createNewIncidentReportResponse.body.data.reportId}`,
+      )
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty(
+        'id',
+        createNewIncidentReportResponse.body.data.reportId,
+      )
+      expect(response.body.data).toHaveProperty('incidentLocation')
+      expect(response.body.data).toHaveProperty('incidentDate')
+      expect(response.body.data).toHaveProperty('incidentDetail')
+      expect(response.body.data).toHaveProperty('incidentStatus')
+      expect(response.body.data.incidentStatus).toHaveProperty('submited', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('onProgress', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('canceled', false)
+      expect(response.body.data.incidentStatus).toHaveProperty('done', false)
+    })
+
+    it('should response 200 when report with done status found', async () => {
+      const createNewIncidentReportResponse = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'Consectetur adipiscing elit',
+          incidentDate: '2023-07-20',
+          incidentDetail: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        })
+
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse.body.data.reportId,
+        IncidentStatus.DONE,
+      )
+
+      const response = await request(app).get(
+        `/api/incident-reports/${createNewIncidentReportResponse.body.data.reportId}`,
+      )
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty(
+        'id',
+        createNewIncidentReportResponse.body.data.reportId,
+      )
+      expect(response.body.data).toHaveProperty('incidentLocation')
+      expect(response.body.data).toHaveProperty('incidentDate')
+      expect(response.body.data).toHaveProperty('incidentDetail')
+      expect(response.body.data).toHaveProperty('incidentStatus')
+      expect(response.body.data.incidentStatus).toHaveProperty('submited', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('onProgress', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('canceled', false)
+      expect(response.body.data.incidentStatus).toHaveProperty('done', true)
+    })
+
+    it('should response 200 when report found and with token', async () => {
+      const user = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      const createNewIncidentReportResponse = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'Consectetur adipiscing elit',
+          incidentDate: '2023-07-20',
+          incidentDetail: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        })
+
+      await incidentReportsTableTestHelper.setIncidentReportStatus(
+        createNewIncidentReportResponse.body.data.reportId,
+        IncidentStatus.CANCELED,
+      )
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: user.email,
+        password: user.password,
+      })
+
+      const response = await request(app)
+        .get(`/api/incident-reports/${createNewIncidentReportResponse.body.data.reportId}`)
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty(
+        'id',
+        createNewIncidentReportResponse.body.data.reportId,
+      )
+      expect(response.body.data).toHaveProperty('reporterName')
+      expect(response.body.data).toHaveProperty('reporterEmail')
+      expect(response.body.data).toHaveProperty('reporterPhone')
+      expect(response.body.data).toHaveProperty('incidentLocation')
+      expect(response.body.data).toHaveProperty('incidentDate')
+      expect(response.body.data).toHaveProperty('incidentDetail')
+      expect(response.body.data).toHaveProperty('incidentStatus')
+      expect(response.body.data.incidentStatus).toHaveProperty('submited', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('onProgress', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('canceled', true)
+      expect(response.body.data.incidentStatus).toHaveProperty('done', true)
+    })
+  })
+
+  describe('PUT /incident-reports/{reportId}/status', () => {
+    it('should response 400 when payload is invalid', async () => {
+      const requestPayload = {
+        status: 'invalid-status',
+      }
+      const user = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: user.email,
+        password: user.password,
+      })
+
+      const response = await request(app)
+        .put('/api/incident-reports/report-xxx/status')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .send(requestPayload)
+
+      expect(response.status).toEqual(httpStatus.BAD_REQUEST)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 404 when payload is invalid', async () => {
+      const requestPayload = {
+        status: 'on-progress',
+      }
+      const user = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: user.email,
+        password: user.password,
+      })
+
+      const response = await request(app)
+        .put('/api/incident-reports/report-xxx/status')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .send(requestPayload)
+
+      expect(response.status).toEqual(httpStatus.NOT_FOUND)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 401 when report found and without token', async () => {
+      const response = await request(app).put('/api/incident-reports/report-xxx/status')
+
+      expect(response.status).toEqual(httpStatus.UNAUTHORIZED)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 200 when report found and with token', async () => {
+      const requestPayload = {
+        status: 'on-progress',
+      }
+      const user = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      const createNewIncidentReportResponse = await request(app)
+        .post('/api/incident-reports')
+        .send({
+          reporterName: 'John Doe',
+          reporterEmail: 'john@mail.com',
+          reporterPhone: '082123456789',
+          incidentLocation: 'Consectetur adipiscing elit',
+          incidentDate: '2023-07-20',
+          incidentDetail: 'Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        })
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: user.email,
+        password: user.password,
+      })
+
+      const response = await request(app)
+        .put(`/api/incident-reports/${createNewIncidentReportResponse.body.data.reportId}/status`)
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .send(requestPayload)
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty(
+        'reportId',
+        createNewIncidentReportResponse.body.data.reportId,
+      )
     })
   })
 })
