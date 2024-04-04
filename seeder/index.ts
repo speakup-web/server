@@ -1,11 +1,11 @@
 /* eslint-disable no-console */
 
-import * as path from 'path'
-import * as fs from 'fs'
-import * as bcrypt from 'bcrypt'
-import { pool } from '@Infrastructures/database/postgres/pool'
+import path from 'path'
+import fs from 'fs'
+import bcrypt from 'bcrypt'
+import { Pool } from 'pg'
 
-async function processFile(fileName: string, dataFolderPath: string): Promise<string> {
+async function processFile(fileName: string, dataFolderPath: string, pool: Pool): Promise<string> {
   const tableName = fileName.split('.')[0]
   const filePath = path.join(dataFolderPath, fileName)
   const jsonData = fs.readFileSync(filePath, 'utf-8')
@@ -28,14 +28,16 @@ async function processFile(fileName: string, dataFolderPath: string): Promise<st
   return query
 }
 
-async function seedData(): Promise<void> {
+async function seedData(connectionString: string): Promise<void> {
+  const pool = new Pool({ connectionString })
+
   try {
     const dataFolderPath = path.join(process.cwd(), 'seeder', 'data')
     const files = fs.readdirSync(dataFolderPath)
 
     for (const file of files) {
       if (file.endsWith('.json')) {
-        const query = await processFile(file, dataFolderPath)
+        const query = await processFile(file, dataFolderPath, pool)
         await pool.query(query)
         console.log(`Seeding data from ${file} into table ${file.split('.')[0]}`)
       }
@@ -49,4 +51,11 @@ async function seedData(): Promise<void> {
   }
 }
 
-seedData()
+const connectionString = process.argv[2]
+
+if (!connectionString) {
+  console.error('Please provide a connectionString argument')
+  process.exit(1)
+}
+
+seedData(connectionString)
