@@ -65,10 +65,10 @@ export class IncidentReportRepositoryPostgres implements IIncidentReportReposito
                 JOIN reporters AS r ON ir.reporter_id = r.id
                 WHERE 1=1`
 
-    const values: any[] = []
+    const values = []
 
     if (status) {
-      text += ` AND ir.incident_status = $${values.length + 1}`
+      text += ' AND ir.incident_status = $1'
       values.push(status)
     }
 

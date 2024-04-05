@@ -11,6 +11,10 @@ import {
   GetIncidentReportDetailSchema,
   UpdateIncidentReportStatusSchema,
 } from '@Infrastructures/validators/zod/schemas/incidentReportSchemas'
+import {
+  GetTaskforceProfilesSchema,
+  RegisterUserSchema,
+} from '@Infrastructures/validators/zod/schemas/userSchemas'
 // Importing the validator
 import { ZodValidator } from '@Infrastructures/validators/zod/ZodValidator'
 // Importing the repository
@@ -26,6 +30,8 @@ import { GetAllIncidentReportsUseCase } from '@Applications/use_cases/GetAllInci
 import { GetIncidentReportStatsUseCase } from '@Applications/use_cases/GetIncidentReportStatsUseCase'
 import { GetIncidentReportDetailUseCase } from '@Applications/use_cases/GetIncidentReportDetailUseCase'
 import { UpdateIncidentReportStatusUseCase } from '@Applications/use_cases/UpdateIncidentReportStatusUseCase'
+import { CreateTaskforceAccountUseCase } from '@Applications/use_cases/CreateTaskforceAccountUseCase'
+import { GetTaskforceProfilesUseCase } from '@Applications/use_cases/GetTaskforceProfilesUseCase'
 
 export const awilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -48,14 +54,27 @@ awilixContainer.register({
       schema: GetAllIncidentReportsSchema,
     }),
   }),
-  getIncidentReportDetailSchema: asClass(ZodValidator<typeof GetIncidentReportDetailSchema>, {
+  getIncidentReportDetailValidator: asClass(ZodValidator<typeof GetIncidentReportDetailSchema>, {
     injector: () => ({
       schema: GetIncidentReportDetailSchema,
     }),
   }),
-  updateIncidentReportStatusSchema: asClass(ZodValidator<typeof UpdateIncidentReportStatusSchema>, {
+  updateIncidentReportStatusValidator: asClass(
+    ZodValidator<typeof UpdateIncidentReportStatusSchema>,
+    {
+      injector: () => ({
+        schema: UpdateIncidentReportStatusSchema,
+      }),
+    },
+  ),
+  registerUserValidator: asClass(ZodValidator<typeof RegisterUserSchema>, {
     injector: () => ({
-      schema: UpdateIncidentReportStatusSchema,
+      schema: RegisterUserSchema,
+    }),
+  }),
+  getTaskforceProfilesValidator: asClass(ZodValidator<typeof GetTaskforceProfilesSchema>, {
+    injector: () => ({
+      schema: GetTaskforceProfilesSchema,
     }),
   }),
 
@@ -115,14 +134,27 @@ awilixContainer.register({
   }),
   getIncidentReportDetailUseCase: asClass(GetIncidentReportDetailUseCase, {
     injector: (instance) => ({
-      validator: instance.resolve('getIncidentReportDetailSchema'),
+      validator: instance.resolve('getIncidentReportDetailValidator'),
       incidentReportRepository: instance.resolve('incidentReportRepository'),
     }),
   }),
   updateIncidentReportStatusUseCase: asClass(UpdateIncidentReportStatusUseCase, {
     injector: (instance) => ({
-      validator: instance.resolve('updateIncidentReportStatusSchema'),
+      validator: instance.resolve('updateIncidentReportStatusValidator'),
       incidentReportRepository: instance.resolve('incidentReportRepository'),
+    }),
+  }),
+  createTaskforceAccountUseCase: asClass(CreateTaskforceAccountUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('registerUserValidator'),
+      userRepository: instance.resolve('userRepository'),
+      hasher: instance.resolve('hasher'),
+    }),
+  }),
+  getTaskforceProfilesUseCase: asClass(GetTaskforceProfilesUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('getTaskforceProfilesValidator'),
+      userRepository: instance.resolve('userRepository'),
     }),
   }),
 })
