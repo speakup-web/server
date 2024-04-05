@@ -166,4 +166,106 @@ describe('/users', () => {
       expect(response.body.data).toHaveProperty('userId')
     })
   })
+
+  describe('GET /users/task-force', () => {
+    it('should response 401 when get taskforce accounts as an anonymous', async () => {
+      const response = await request(app).get('/api/users/task-force')
+
+      expect(response.status).toEqual(httpStatus.UNAUTHORIZED)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 403 when get taskforce accounts as an taskforce', async () => {
+      const taskforce = new UserBuilder(
+        'Michael',
+        'michael@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(taskforce)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: taskforce.email,
+        password: taskforce.password,
+      })
+
+      const response = await request(app)
+        .get('/api/users/task-force')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+
+      expect(response.status).toEqual(httpStatus.FORBIDDEN)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 400 when limit is invalid', async () => {
+      const admin = new UserBuilder(
+        'Michael',
+        'michael@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      await usersTableTestHelper.addUser(admin)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: admin.email,
+        password: admin.password,
+      })
+
+      const response = await request(app)
+        .get('/api/users/task-force')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .query({
+          limit: 'invalid_limit',
+        })
+
+      expect(response.status).toEqual(httpStatus.BAD_REQUEST)
+      expect(response.body).toHaveProperty('status', 'fail')
+      expect(response.body).toHaveProperty('message')
+    })
+
+    it('should response 200 when get taskforce accounts successfully', async () => {
+      const admin = new UserBuilder(
+        'Michael',
+        'michael@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      await usersTableTestHelper.addUser(admin)
+
+      const loginResponse = await request(app).post('/api/auth/login').send({
+        email: admin.email,
+        password: admin.password,
+      })
+
+      await request(app)
+        .post('/api/users/task-force')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .send({
+          name: 'John Doe',
+          email: 'johndoe@mail.com',
+          password: 'secret_password',
+        })
+      await request(app)
+        .post('/api/users/task-force')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+        .send({
+          name: 'Jane Doe',
+          email: 'janedoe@mail.com',
+          password: 'secret_password',
+        })
+
+      const response = await request(app)
+        .get('/api/users/task-force')
+        .set('Authorization', `Bearer ${loginResponse.body.data.accessToken}`)
+
+      expect(response.status).toEqual(httpStatus.OK)
+      expect(response.body).toHaveProperty('status', 'success')
+      expect(response.body).toHaveProperty('data')
+      expect(response.body.data).toHaveProperty('count', 2)
+      expect(response.body.data).toHaveProperty('results')
+      expect(response.body.data.results).toHaveLength(2)
+    })
+  })
 })
