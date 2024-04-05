@@ -2,16 +2,44 @@
   "users": [
     {
       "id": "user-TRf_OwH11AnT3p7S437co",
-      "name": "John Doe",
-      "email": "johndoe@example.com",
-      "password": "johndoe@example.com",
+      "name": "Tiara",
+      "email": "tiara@mail.com",
+      "password": "tiara@mail.com",
       "role": "admin"
     },
     {
       "id": "user-Qy2h5lyqScRXsPlIH4hln",
-      "name": "Jane Smith",
-      "email": "janesmith@example.com",
-      "password": "janesmith@example.com",
+      "name": "Denny",
+      "email": "denny@mail.com",
+      "password": "denny@mail.com",
+      "role": "admin"
+    },
+    {
+      "id": "user-CMCB5RfxCgdKDAciOgo35",
+      "name": "Kenzie",
+      "email": "kenzie@mail.com",
+      "password": "kenzie@mail.com",
+      "role": "admin"
+    },
+    {
+      "id": "user-vNmOCLCipzRTJK0G4vOnd",
+      "name": "Fajar",
+      "email": "fajar@mail.com",
+      "password": "fajar@mail.com",
+      "role": "admin"
+    },
+    {
+      "id": "user-LYxcOzd3305nHPw1i4aRX",
+      "name": "Sarifudin",
+      "email": "sarifudin@mail.com",
+      "password": "sarifudin@mail.com",
+      "role": "admin"
+    },
+    {
+      "id": "user-xKoME8S41BDEQbwB6dCOG",
+      "name": "Rizal",
+      "email": "rizal@mail.com",
+      "password": "rizal@mail.com",
       "role": "admin"
     }
   ]
