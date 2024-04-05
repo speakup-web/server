@@ -26,4 +26,19 @@ export class UserRepositoryPostgres implements IUserRepository {
 
     return new User(rows[0].id, rows[0].name, rows[0].email, rows[0].password, rows[0].role)
   }
+
+  public async save(user: User): Promise<void> {
+    const query = {
+      text: `INSERT INTO users (
+                id,
+                name,
+                email,
+                password,
+                role)
+             VALUES ($1, $2, $3, $4, $5)`,
+      values: [user.id, user.name, user.email, user.password, user.role],
+    }
+
+    await this.pool.query(query)
+  }
 }
