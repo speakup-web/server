@@ -1,4 +1,5 @@
 import { type CreateTaskforceAccountUseCase } from '@Applications/use_cases/CreateTaskforceAccountUseCase'
+import { type GetTaskforceProfilesUseCase } from '@Applications/use_cases/GetTaskforceProfilesUseCase'
 import { UserRole } from '@Domains/enums/UserRole'
 import { authenticateMiddleware } from '@Infrastructures/http/express/middlewares/authenticateMiddleware'
 import { authorizeMiddleware } from '@Infrastructures/http/express/middlewares/authorizeMiddleware'
@@ -23,6 +24,27 @@ userRoutes.post(
     })
 
     res.status(httpStatus.CREATED).json({
+      status: 'success',
+      data,
+    })
+  },
+)
+
+userRoutes.get(
+  '/task-force',
+  authenticateMiddleware({ required: true }),
+  authorizeMiddleware([UserRole.ADMIN]),
+  async (req: Request, res: Response) => {
+    const getTaskforceProfilesUseCase = req.container.resolve<GetTaskforceProfilesUseCase>(
+      'getTaskforceProfilesUseCase',
+    )
+
+    const data = await getTaskforceProfilesUseCase.execute({
+      limit: req.query.limit,
+      offset: req.query.offset,
+    })
+
+    res.json({
       status: 'success',
       data,
     })
