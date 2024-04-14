@@ -182,8 +182,8 @@ describe('IncidentReportRepositoryPostgres', () => {
     })
   })
 
-  describe('allCount', () => {
-    it('should return correct value when', async () => {
+  describe('countAll', () => {
+    it('should return correct value when not given a status', async () => {
       const reporter = new ReporterBuilder(
         'John Doe',
         'johndoe@example.com',
@@ -200,6 +200,28 @@ describe('IncidentReportRepositoryPostgres', () => {
       await incidentReportsTableTestHelper.addIncidentReport(incidentReport)
 
       const count = await incidentReportRepositoryPostgres.countAll()
+
+      expect(count).toEqual(1)
+    })
+
+    it('should return correct value when given a status', async () => {
+      const reporter = new ReporterBuilder(
+        'John Doe',
+        'johndoe@example.com',
+        '081123456789',
+      ).build()
+      const incidentReport = new IncidentReportBuilder(
+        'lorem ipsum dolor sit amet',
+        new Date('2024-01-01'),
+        'lorem ipsum dolor sit amet consectetur adipiscing elit',
+        IncidentStatus.SUBMITED,
+        reporter,
+      ).build()
+      await reportersTableTestHelper.addReporter(reporter)
+      await incidentReportsTableTestHelper.addIncidentReport(incidentReport)
+      const status = 'submited'
+
+      const count = await incidentReportRepositoryPostgres.countAll(status)
 
       expect(count).toEqual(1)
     })
