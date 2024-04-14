@@ -3,6 +3,6 @@ import { type IncidentReport } from '@Domains/entities/IncidentReport/IncidentRe
 export interface IIncidentReportRepository {
   findById: (id: string) => Promise<IncidentReport | null>
   findAll: (limit?: number, offset?: number, status?: string) => Promise<IncidentReport[]>
-  countAll: () => Promise<number>
+  countAll: (status?: string) => Promise<number>
   save: (incidentReport: IncidentReport) => Promise<void>
 }

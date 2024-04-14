@@ -28,7 +28,7 @@ if (process.env.NODE_ENV === PRODUCTION_ENV) {
   loggerLevel = DEBUG_LOGGING_LVL
 }
 
-export const winstonLogger = winston.createLogger({
+export const winstonInstance = winston.createLogger({
   level: loggerLevel,
   format: getFormat(),
   transports: getTransports(),

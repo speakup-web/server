@@ -113,8 +113,17 @@ export class IncidentReportRepositoryPostgres implements IIncidentReportReposito
     })
   }
 
-  public async countAll(): Promise<number> {
-    const query = 'SELECT COUNT(*) FROM incident_reports'
+  public async countAll(status?: string): Promise<number> {
+    let text = 'SELECT COUNT(*) FROM incident_reports'
+    const values = []
+
+    if (status) {
+      text += ' WHERE incident_status = $1'
+      values.push(status)
+    }
+
+    const query: QueryConfig = { text, values }
+
     const { rows } = await this.pool.query(query)
     return parseInt(rows[0].count, 10)
   }

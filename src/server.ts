@@ -1,6 +1,6 @@
 import http from 'http'
 import { config } from '@Commons/config'
-import { winstonLogger } from '@Infrastructures/loggers/winstonLogger'
+import { winstonInstance } from '@Infrastructures/loggers/winstonInstance'
 import { createApp } from '@Infrastructures/http/express/app'
 import { awilixContainer } from '@Infrastructures/containers/awilixContainer'
 
@@ -9,7 +9,7 @@ const server = http.createServer(app)
 
 async function start(): Promise<void> {
   server.listen(config.app.port, () => {
-    winstonLogger.info(`listening on :${config.app.port}`)
+    winstonInstance.info(`listening on :${config.app.port}`)
   })
 }
 

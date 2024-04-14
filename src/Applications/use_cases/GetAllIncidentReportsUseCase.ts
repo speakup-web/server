@@ -14,7 +14,7 @@ interface UseCaseResult {
     id: string
     reporterName: string
     reporterEmail: string
-    incidentDetail: string
+    incidentDate: Date
   }>
 }
 
@@ -27,7 +27,7 @@ export class GetAllIncidentReportsUseCase {
   public async execute(useCasePayload: unknown): Promise<UseCaseResult> {
     const payload = this.validator.validate(useCasePayload)
 
-    const count = await this.incidentReportRepository.countAll()
+    const count = await this.incidentReportRepository.countAll(payload.status)
     const incidentReports = await this.incidentReportRepository.findAll(
       payload.limit,
       payload.offset,
@@ -40,7 +40,7 @@ export class GetAllIncidentReportsUseCase {
         id: report.id,
         reporterName: report.reporter.name,
         reporterEmail: report.reporter.email,
-        incidentDetail: report.incidentDetail,
+        incidentDate: report.incidentDate,
       })),
     }
 
