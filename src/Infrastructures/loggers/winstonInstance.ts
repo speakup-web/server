@@ -1,6 +1,6 @@
 /* istanbul ignore file */
 
-import winston from 'winston'
+import { type Logform, format, transports, createLogger } from 'winston'
 import {
   DEBUG_LOGGING_LVL,
   INFO_LOGGING_LVL,
@@ -9,13 +9,12 @@ import {
   TEST_ENV,
 } from '@Commons/constants'
 
-function getFormat(): winston.Logform.Format {
-  return winston.format.combine(winston.format.json(), winston.format.prettyPrint())
+function getFormat(): Logform.Format {
+  return format.combine(format.json(), format.prettyPrint())
 }
 
-function getTransports(): winston.transports.ConsoleTransportInstance[] {
-  const transports = [new winston.transports.Console()]
-  return transports
+function getTransports(): transports.ConsoleTransportInstance[] {
+  return [new transports.Console()]
 }
 
 let loggerLevel: string
@@ -28,7 +27,7 @@ if (process.env.NODE_ENV === PRODUCTION_ENV) {
   loggerLevel = DEBUG_LOGGING_LVL
 }
 
-export const winstonInstance = winston.createLogger({
+export const winstonInstance = createLogger({
   level: loggerLevel,
   format: getFormat(),
   transports: getTransports(),
