@@ -1,19 +1,20 @@
-import express from 'express'
+import express, { type Express } from 'express'
 import cors from 'cors'
 import 'express-async-errors'
-import expressWinston from 'express-winston'
+import { logger, errorLogger } from 'express-winston'
 import { type AwilixContainer } from 'awilix'
 import { routes } from '@Interfaces/api/routes'
-import { errorMiddleware } from './middlewares/errorMiddleware'
+import { customErrorHandler, unknownErrorHandler } from './middlewares/errorMiddleware'
 import { containerMiddleware } from './middlewares/containerMiddleware'
 import { winstonInstance } from '@Infrastructures/loggers/winstonInstance'
+import { config } from '@Commons/config'
 
-export function createApp(container: AwilixContainer): express.Express {
+export function createApp(container: AwilixContainer): Express {
   const app = express()
 
-  app.use(cors())
+  app.use(cors({ origin: config.cors.origin }))
   app.use(express.json())
-  app.use(expressWinston.logger({ winstonInstance, responseWhitelist: ['body'] }))
+  app.use(logger({ winstonInstance, responseWhitelist: ['body'] }))
 
   app.use('/api', containerMiddleware(container), routes)
 
@@ -21,8 +22,9 @@ export function createApp(container: AwilixContainer): express.Express {
     res.send('Welcome to SpeakUp API')
   })
 
-  app.use(expressWinston.errorLogger({ winstonInstance }))
-  app.use(errorMiddleware)
+  app.use(customErrorHandler)
+  app.use(errorLogger({ winstonInstance }))
+  app.use(unknownErrorHandler)
 
   return app
 }
