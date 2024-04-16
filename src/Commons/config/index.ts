@@ -19,4 +19,7 @@ export const config = {
     secretKey: process.env.JWT_SECRET_KEY ?? 'secret',
     expiresIn: process.env.JWT_EXPIRES_IN ?? '3h',
   },
+  cors: {
+    origin: process.env.CORS_ORIGIN ?? '*',
+  },
 }
