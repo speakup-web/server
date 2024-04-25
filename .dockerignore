@@ -1,6 +1,11 @@
+.git
 node_modules
 coverage
 dist
 seeder
+migrations
+test
+src/**/*.test.ts
 
 .env.*
+.gitignore
