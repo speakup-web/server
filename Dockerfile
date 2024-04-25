@@ -1,15 +1,18 @@
 FROM node:20.11.1-alpine AS builder
-WORKDIR /usr/src/app
-COPY package.json ./
-RUN yarn install
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable
+WORKDIR /app
+COPY package.json pnpm-lock.yaml .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile
 COPY . .
-RUN yarn build
+RUN pnpm build
 
-FROM node:20.11.1-alpine
-WORKDIR /usr/src/app
-COPY package.json ./
-RUN yarn install --prod
-COPY --from=builder /usr/src/app/dist ./dist
+FROM builder
+WORKDIR /app
+COPY package.json pnpm-lock.yaml .
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --prod --frozen-lockfile
+COPY --from=builder /app/dist ./dist
 
 EXPOSE 8080
-CMD ["yarn", "start"]
+CMD ["pnpm", "start"]
