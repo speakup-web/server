@@ -4,20 +4,28 @@
     "node": true,
     "jest": true
   },
-  "extends": ["plugin:prettier/recommended", "standard-with-typescript"],
+  "extends": ["plugin:prettier/recommended"],
   "parserOptions": {
     "ecmaVersion": "latest",
     "sourceType": "module"
   },
   "ignorePatterns": ["**/*.config.js", "**/dist"],
   "rules": {
-    "no-console": "error",
-    "@typescript-eslint/comma-dangle": "off",
-    "@typescript-eslint/space-before-function-paren": "off",
-    "@typescript-eslint/no-floating-promises": "off",
-    "@typescript-eslint/consistent-type-assertions": "off",
-    "@typescript-eslint/strict-boolean-expressions": "off",
-    "@typescript-eslint/no-misused-promises": "off",
-    "@typescript-eslint/no-unsafe-argument": "off"
-  }
+    "no-console": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.ts"],
+      "extends": "love",
+      "rules": {
+        "@typescript-eslint/comma-dangle": "off",
+        "@typescript-eslint/space-before-function-paren": "off",
+        "@typescript-eslint/no-floating-promises": "off",
+        "@typescript-eslint/consistent-type-assertions": "off",
+        "@typescript-eslint/strict-boolean-expressions": "off",
+        "@typescript-eslint/no-misused-promises": "off",
+        "@typescript-eslint/no-unsafe-argument": "off"
+      }
+    }
+  ]
 }
