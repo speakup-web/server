@@ -13,12 +13,13 @@ export class UserRepositoryPostgres implements IUserRepository {
                   email,
                   password,
                   role
-                FROM users`
+                FROM users
+                WHERE is_deleted = false`
 
     const values = []
 
     if (role) {
-      text += ' WHERE role = $1'
+      text += ' AND role = $1'
       values.push(role)
     }
 
@@ -47,11 +48,12 @@ export class UserRepositoryPostgres implements IUserRepository {
   }
 
   public async countAll(role?: UserRole): Promise<number> {
-    let text = 'SELECT COUNT(*) FROM users'
+    let text = `SELECT COUNT(*) FROM users
+                WHERE is_deleted = false`
     const values = []
 
     if (role) {
-      text += ' WHERE role = $1'
+      text += ' AND role = $1'
       values.push(role)
     }
 
@@ -74,7 +76,7 @@ export class UserRepositoryPostgres implements IUserRepository {
                 password,
                 role
              FROM users
-             WHERE email = $1`,
+             WHERE is_deleted = false AND email = $1`,
       values: [email],
     }
 
