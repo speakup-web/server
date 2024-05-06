@@ -29,4 +29,15 @@ export class UsersTableTestHelper {
 
     await this.pool.query(query)
   }
+
+  public async deleteUserById(userId: string): Promise<void> {
+    const query = {
+      text: `UPDATE users
+             SET is_deleted = true
+             WHERE id = $1`,
+      values: [userId],
+    }
+
+    await this.pool.query(query)
+  }
 }
