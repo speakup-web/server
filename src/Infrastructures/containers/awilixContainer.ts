@@ -14,6 +14,10 @@ import {
 import {
   GetTaskforceProfilesSchema,
   RegisterUserSchema,
+  GetUserProfileSchema,
+  UpdateUserSchema,
+  DeleteUserSchema,
+  UpdateTaskforceSchema,
 } from '@Infrastructures/validators/zod/schemas/userSchemas'
 // Importing the validator
 import { ZodValidator } from '@Infrastructures/validators/zod/ZodValidator'
@@ -32,6 +36,10 @@ import { GetIncidentReportDetailUseCase } from '@Applications/use_cases/GetIncid
 import { UpdateIncidentReportStatusUseCase } from '@Applications/use_cases/UpdateIncidentReportStatusUseCase'
 import { CreateTaskforceAccountUseCase } from '@Applications/use_cases/CreateTaskforceAccountUseCase'
 import { GetTaskforceProfilesUseCase } from '@Applications/use_cases/GetTaskforceProfilesUseCase'
+import { GetUserProfileUseCase } from '@Applications/use_cases/GetUserProfileUseCase'
+import { UpdateUserUseCase } from '@Applications/use_cases/UpdateUserUseCase'
+import { DeleteTaskforceUseCase } from '@Applications/use_cases/DeleteTaskforceUseCase'
+import { UpdateTaskforceUseCase } from '@Applications/use_cases/UpdateTaskforceUseCase'
 
 export const awilixContainer = createContainer({
   injectionMode: InjectionMode.CLASSIC,
@@ -75,6 +83,26 @@ awilixContainer.register({
   getTaskforceProfilesValidator: asClass(ZodValidator<typeof GetTaskforceProfilesSchema>, {
     injector: () => ({
       schema: GetTaskforceProfilesSchema,
+    }),
+  }),
+  getUserProfileValidator: asClass(ZodValidator<typeof GetUserProfileSchema>, {
+    injector: () => ({
+      schema: GetUserProfileSchema,
+    }),
+  }),
+  updateUserValidator: asClass(ZodValidator<typeof UpdateUserSchema>, {
+    injector: () => ({
+      schema: UpdateUserSchema,
+    }),
+  }),
+  deleteUserValidator: asClass(ZodValidator<typeof DeleteUserSchema>, {
+    injector: () => ({
+      schema: DeleteUserSchema,
+    }),
+  }),
+  updateTaskforceValidator: asClass(ZodValidator<typeof UpdateTaskforceSchema>, {
+    injector: () => ({
+      schema: UpdateTaskforceSchema,
     }),
   }),
 
@@ -155,6 +183,32 @@ awilixContainer.register({
     injector: (instance) => ({
       validator: instance.resolve('getTaskforceProfilesValidator'),
       userRepository: instance.resolve('userRepository'),
+    }),
+  }),
+  getUserProfileUseCase: asClass(GetUserProfileUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('getUserProfileValidator'),
+      userRepository: instance.resolve('userRepository'),
+    }),
+  }),
+  updateUserUseCase: asClass(UpdateUserUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('updateUserValidator'),
+      userRepository: instance.resolve('userRepository'),
+      hasher: instance.resolve('hasher'),
+    }),
+  }),
+  deleteTaskforceUseCase: asClass(DeleteTaskforceUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('deleteUserValidator'),
+      userRepository: instance.resolve('userRepository'),
+    }),
+  }),
+  updateTaskforceUseCase: asClass(UpdateTaskforceUseCase, {
+    injector: (instance) => ({
+      validator: instance.resolve('updateTaskforceValidator'),
+      userRepository: instance.resolve('userRepository'),
+      hasher: instance.resolve('hasher'),
     }),
   }),
 })

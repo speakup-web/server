@@ -314,4 +314,22 @@ describe('UserRepositoryPostgres', () => {
       expect(result).toBeNull()
     })
   })
+
+  describe('deleteByEmail', () => {
+    it('should delete user correctly', async () => {
+      const user = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      await userRepositoryPostgres.deleteByEmail(user.email)
+
+      const users = await usersTableTestHelper.findUsers()
+
+      expect(users).toHaveLength(0)
+    })
+  })
 })

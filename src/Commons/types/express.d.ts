@@ -7,7 +7,7 @@ declare global {
       container: AwilixContainer
       isAuthenticated: boolean
       user: {
-        id: string
+        email: string
         role: UserRole
       }
     }

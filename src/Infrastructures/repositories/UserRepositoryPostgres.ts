@@ -89,6 +89,17 @@ export class UserRepositoryPostgres implements IUserRepository {
     return new User(rows[0].id, rows[0].name, rows[0].email, rows[0].password, rows[0].role)
   }
 
+  public async deleteByEmail(email: string): Promise<void> {
+    const query = {
+      text: `UPDATE users
+             SET is_deleted = true
+             WHERE email = $1`,
+      values: [email],
+    }
+
+    await this.pool.query(query)
+  }
+
   public async save(user: User): Promise<void> {
     const query = {
       text: `INSERT INTO users (
@@ -97,7 +108,13 @@ export class UserRepositoryPostgres implements IUserRepository {
                 email,
                 password,
                 role)
-             VALUES ($1, $2, $3, $4, $5)`,
+             VALUES ($1, $2, $3, $4, $5)
+             ON CONFLICT (id) DO
+             UPDATE SET
+                name = $2,
+                email = $3,
+                password = $4,
+                role = $5`,
       values: [user.id, user.name, user.email, user.password, user.role],
     }
 

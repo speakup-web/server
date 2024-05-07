@@ -1,5 +1,4 @@
 import { AuthenticationError } from '@Commons/exceptions/AuthenticationError'
-import { type UserRole } from '@Domains/enums/UserRole'
 import { JwtTokenManager } from '@Infrastructures/securities/JWTTokenManager'
 import { type NextFunction, type Request, type Response } from 'express'
 import * as jose from 'jose'
@@ -21,12 +20,12 @@ export function authenticateMiddleware({ required }: { required: boolean }) {
 
       const token = authorization.split(' ')[1]
       const jwtTokenManager = new JwtTokenManager(jose)
-      const tokenPayload = await jwtTokenManager.verify(token)
+      const tokenPayload = (await jwtTokenManager.verify(token)) as Request['user']
 
       req.isAuthenticated = true
       req.user = {
-        id: tokenPayload.id as string,
-        role: tokenPayload.role as UserRole,
+        email: tokenPayload.email,
+        role: tokenPayload.role,
       }
 
       next()

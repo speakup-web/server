@@ -1,4 +1,10 @@
-import { GetTaskforceProfilesSchema, RegisterUserSchema } from '../userSchemas'
+import { UserRole } from '@Domains/enums/UserRole'
+import {
+  GetTaskforceProfilesSchema,
+  GetUserProfileSchema,
+  RegisterUserSchema,
+  UpdateUserSchema,
+} from '../userSchemas'
 
 describe('userSchemas', () => {
   describe('RegisterUserSchema', () => {
@@ -30,6 +36,37 @@ describe('userSchemas', () => {
       }
 
       const { success } = RegisterUserSchema.safeParse(payload)
+
+      expect(success).toEqual(true)
+    })
+  })
+
+  describe('GetUserProfileSchema', () => {
+    it('should invalidates when object is empty', () => {
+      const { success } = GetUserProfileSchema.safeParse(null)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should invalidates when user is invalid', () => {
+      const payload = {
+        user: [],
+      }
+
+      const { success } = GetUserProfileSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should validates when payload is correct', () => {
+      const payload = {
+        user: {
+          email: 'johndoe@mail.com',
+          role: UserRole.TASKFORCE,
+        },
+      }
+
+      const { success } = GetUserProfileSchema.safeParse(payload)
 
       expect(success).toEqual(true)
     })
@@ -79,6 +116,43 @@ describe('userSchemas', () => {
       }
 
       const { success } = GetTaskforceProfilesSchema.safeParse(payload)
+
+      expect(success).toEqual(true)
+    })
+  })
+
+  describe('UpdateUserSchema', () => {
+    it('should invalidates when name is invalid', () => {
+      const payload = {
+        user: [],
+        name: true,
+        password: 'abcd1234',
+      }
+
+      const { success } = UpdateUserSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should invalidates when object is empty', () => {
+      const payload = {}
+
+      const { success } = UpdateUserSchema.safeParse(payload)
+
+      expect(success).toEqual(false)
+    })
+
+    it('should validates when payload is correct', () => {
+      const payload = {
+        user: {
+          email: 'johndoe@mail.com',
+          role: UserRole.TASKFORCE,
+        },
+        name: 'John Doe',
+        password: 'abcd1234',
+      }
+
+      const { success } = UpdateUserSchema.safeParse(payload)
 
       expect(success).toEqual(true)
     })
