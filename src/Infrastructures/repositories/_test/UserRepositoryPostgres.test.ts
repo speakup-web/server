@@ -164,6 +164,31 @@ describe('UserRepositoryPostgres', () => {
       expect(users[0].id).toEqual(user2.id)
       expect(users[1].id).toEqual(user3.id)
     })
+
+    it('should return users that were not deleted', async () => {
+      const user1 = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      const user2 = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user1)
+      await usersTableTestHelper.addUser(user2)
+      await usersTableTestHelper.deleteUserById(user2.id)
+      const limit = 2
+      const offset = 0
+
+      const users = await userRepositoryPostgres.findAll(limit, offset)
+
+      expect(users).toHaveLength(1)
+      expect(users[0].id).toEqual(user1.id)
+    })
   })
 
   describe('countAll', () => {
@@ -223,6 +248,28 @@ describe('UserRepositoryPostgres', () => {
       expect(totalAdmins).toEqual(1)
       expect(totalTaskforces).toEqual(2)
     })
+
+    it('should return the total number of users who were not deleted', async () => {
+      const user1 = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      const user2 = new UserBuilder(
+        'Jane Doe',
+        'janedoe@mail.com',
+        'secret_password',
+        UserRole.TASKFORCE,
+      ).build()
+      await usersTableTestHelper.addUser(user1)
+      await usersTableTestHelper.addUser(user2)
+      await usersTableTestHelper.deleteUserById(user2.id)
+
+      const totalUsers = await userRepositoryPostgres.countAll()
+
+      expect(totalUsers).toEqual(1)
+    })
   })
 
   describe('findByEmail', () => {
@@ -250,6 +297,39 @@ describe('UserRepositoryPostgres', () => {
       expect(result?.email).toEqual(user.email)
       expect(result?.password).not.toEqual(user.password)
       expect(result?.role).toEqual(user.role)
+    })
+
+    it('should return user who is not deleted', async () => {
+      const user = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+      await usersTableTestHelper.deleteUserById(user.id)
+
+      const result = await userRepositoryPostgres.findByEmail(user.email)
+
+      expect(result).toBeNull()
+    })
+  })
+
+  describe('deleteByEmail', () => {
+    it('should delete user correctly', async () => {
+      const user = new UserBuilder(
+        'John Doe',
+        'johndoe@mail.com',
+        'secret_password',
+        UserRole.ADMIN,
+      ).build()
+      await usersTableTestHelper.addUser(user)
+
+      await userRepositoryPostgres.deleteByEmail(user.email)
+
+      const users = await usersTableTestHelper.findUsers()
+
+      expect(users).toHaveLength(0)
     })
   })
 })

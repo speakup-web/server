@@ -35,6 +35,11 @@ export async function up(pgm: MigrationBuilder): Promise<void> {
       notNull: true,
       default: pgm.func('current_timestamp'),
     },
+    is_deleted: {
+      type: 'boolean',
+      notNull: true,
+      default: false,
+    },
   })
 }
 
