@@ -1,6 +1,7 @@
 import { type NextFunction, type Request, type Response } from 'express'
 import httpStatus from 'http-status'
 import { ClientError } from '@Commons/exceptions/ClientError'
+import { winstonInstance } from '@Infrastructures/loggers/winstonInstance'
 
 export function customErrorHandler(
   err: unknown,
@@ -25,6 +26,8 @@ export function unknownErrorHandler(
   next: NextFunction,
 ): void {
   if (err instanceof Error) {
+    winstonInstance.error(err.message)
+
     res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
       status: 'error',
       message: 'Internal Server Error.',
